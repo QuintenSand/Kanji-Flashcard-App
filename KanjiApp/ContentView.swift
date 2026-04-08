@@ -21,7 +21,7 @@ struct ContentView: View {
                     Label("Statistics", systemImage: "chart.bar.fill")
                 }
         }
-        .tint(.accentColor)
+        .tint(Color.accentColor)
     }
 }
 

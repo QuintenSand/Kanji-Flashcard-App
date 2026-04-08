@@ -103,7 +103,7 @@ private struct DueTodayBanner: View {
                 Circle().fill(Color.accentColor.opacity(0.15)).frame(width: 52, height: 52)
                 Text("\(dueCount)")
                     .font(.title2.weight(.bold))
-                    .foregroundStyle(.accentColor)
+                    .foregroundStyle(Color.accentColor)
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(dueCount == 0 ? "All done for today 🎉" : "Cards due today")
@@ -189,7 +189,7 @@ private struct StudyStatTile: View {
         VStack(spacing: 4) {
             Image(systemName: icon)
                 .font(.caption)
-                .foregroundStyle(.accentColor)
+                .foregroundStyle(Color.accentColor)
             Text(value).font(.title3.weight(.bold))
             Text(label).font(.caption2).foregroundStyle(.secondary)
         }
