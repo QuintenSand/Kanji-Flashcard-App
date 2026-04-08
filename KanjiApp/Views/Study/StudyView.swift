@@ -217,7 +217,7 @@ struct LevelPickerSheet: View {
                     Spacer()
                     if appState.selectedLevels.contains(level) {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.accentColor)
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
                 .contentShape(Rectangle())
