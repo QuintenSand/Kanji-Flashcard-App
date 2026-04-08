@@ -1,0 +1,169 @@
+import Foundation
+import Combine
+
+// MARK: - App State (ObservableObject, persisted via UserDefaults)
+final class AppState: ObservableObject {
+
+    // ── SRS cards: kanjiID → SRSCard
+    @Published var cards: [String: SRSCard] = [:] {
+        didSet { save() }
+    }
+
+    // ── Study streak
+    @Published var studyDates: [Date] = [] {
+        didSet { save() }
+    }
+
+    // ── Session history: (date, count, correct)
+    @Published var sessionHistory: [StudySession] = [] {
+        didSet { save() }
+    }
+
+    // ── Selected JLPT levels for study
+    @Published var selectedLevels: Set<JLPTLevel> = [.N5] {
+        didSet { save() }
+    }
+
+    // ─────────────────────────────────────────────────────
+    private let defaults = UserDefaults.standard
+    private enum Keys {
+        static let cards          = "srs_cards_v1"
+        static let studyDates     = "study_dates_v1"
+        static let sessionHistory = "session_history_v1"
+        static let selectedLevels = "selected_levels_v1"
+    }
+
+    init() { load() }
+
+    // MARK: - Computed stats
+    var currentStreak: Int {
+        guard !studyDates.isEmpty else { return 0 }
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        var streak = 0
+        var checkDate = today
+
+        while true {
+            let studied = studyDates.contains {
+                calendar.isDate($0, inSameDayAs: checkDate)
+            }
+            guard studied else { break }
+            streak += 1
+            checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+        }
+        return streak
+    }
+
+    var longestStreak: Int {
+        guard !studyDates.isEmpty else { return 0 }
+        let calendar = Calendar.current
+        let sorted = studyDates
+            .map { calendar.startOfDay(for: $0) }
+            .sorted()
+        var best = 1, current = 1
+        for i in 1..<sorted.count {
+            let diff = calendar.dateComponents([.day], from: sorted[i-1], to: sorted[i]).day ?? 0
+            if diff == 1 { current += 1; best = max(best, current) }
+            else if diff > 1 { current = 1 }
+        }
+        return best
+    }
+
+    var totalReviewed: Int { cards.values.reduce(0) { $0 + $1.totalReviews } }
+    var totalCorrect:  Int { cards.values.reduce(0) { $0 + $1.correctReviews } }
+    var overallAccuracy: Double {
+        guard totalReviewed > 0 else { return 0 }
+        return Double(totalCorrect) / Double(totalReviewed)
+    }
+
+    var masteredCount: Int {
+        // card with interval >= 21 days is "mastered"
+        cards.values.filter { $0.interval >= 21 }.count
+    }
+
+    var learnedCount: Int {
+        cards.values.filter { $0.repetitions > 0 }.count
+    }
+
+    var dueCount: Int {
+        cards.values.filter { $0.isDueForReview }.count
+    }
+
+    func levelProgress(_ level: JLPTLevel) -> Double {
+        let total = KanjiDatabase.all.filter { $0.level == level }.count
+        guard total > 0 else { return 0 }
+        let learned = cards.values.filter { card in
+            guard let k = KanjiDatabase.all.first(where: { $0.id == card.id }) else { return false }
+            return k.level == level && card.repetitions > 0
+        }.count
+        return Double(learned) / Double(total)
+    }
+
+    // MARK: - Study actions
+    func recordReview(kanjiID: String, rating: ReviewRating) {
+        let existing = cards[kanjiID] ?? SRSCard(kanjiID: kanjiID)
+        cards[kanjiID] = SRSEngine.processReview(card: existing, rating: rating)
+        markStudiedToday()
+    }
+
+    func recordSession(_ session: StudySession) {
+        sessionHistory.append(session)
+        if sessionHistory.count > 200 { sessionHistory.removeFirst() }
+    }
+
+    private func markStudiedToday() {
+        let today = Calendar.current.startOfDay(for: Date())
+        if !studyDates.contains(where: { Calendar.current.isDate($0, inSameDayAs: today) }) {
+            studyDates.append(today)
+        }
+    }
+
+    // MARK: - Persistence
+    private func save() {
+        if let data = try? JSONEncoder().encode(cards) {
+            defaults.set(data, forKey: Keys.cards)
+        }
+        if let data = try? JSONEncoder().encode(studyDates) {
+            defaults.set(data, forKey: Keys.studyDates)
+        }
+        if let data = try? JSONEncoder().encode(sessionHistory) {
+            defaults.set(data, forKey: Keys.sessionHistory)
+        }
+        let levelRaws = selectedLevels.map { $0.rawValue }
+        defaults.set(levelRaws, forKey: Keys.selectedLevels)
+    }
+
+    private func load() {
+        if let data = defaults.data(forKey: Keys.cards),
+           let decoded = try? JSONDecoder().decode([String: SRSCard].self, from: data) {
+            cards = decoded
+        }
+        if let data = defaults.data(forKey: Keys.studyDates),
+           let decoded = try? JSONDecoder().decode([Date].self, from: data) {
+            studyDates = decoded
+        }
+        if let data = defaults.data(forKey: Keys.sessionHistory),
+           let decoded = try? JSONDecoder().decode([StudySession].self, from: data) {
+            sessionHistory = decoded
+        }
+        if let raws = defaults.stringArray(forKey: Keys.selectedLevels) {
+            selectedLevels = Set(raws.compactMap { JLPTLevel(rawValue: $0) })
+            if selectedLevels.isEmpty { selectedLevels = [.N5] }
+        }
+    }
+}
+
+// MARK: - Study Session Record
+struct StudySession: Codable, Identifiable {
+    var id = UUID()
+    var date: Date
+    var reviewed: Int
+    var correct: Int
+    var durationSeconds: Int
+    var levels: [String]
+
+    var accuracy: Double {
+        guard reviewed > 0 else { return 0 }
+        return Double(correct) / Double(reviewed)
+    }
+}
