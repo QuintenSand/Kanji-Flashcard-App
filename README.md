@@ -15,9 +15,18 @@ A native iOS flashcard app for learning Japanese kanji across all five JLPT leve
 
 ---
 
-## Screenshots
+## Kanji Database
 
-> _Add screenshots here once the app is running on a simulator or device._
+| Level | Count | Description |
+|-------|-------|-------------|
+| N5    | 85    | Basic kanji — numbers, days, family, directions |
+| N4    | 126   | Elementary kanji — actions, places, common adjectives |
+| N3    | 101   | Intermediate kanji — society, nature, abstract concepts |
+| N2    | 85    | Upper-intermediate — formal vocabulary, compound words |
+| N1    | 100   | Advanced — literature, specialist, and rare-use kanji |
+| **Total** | **497** | |
+
+Each kanji includes meanings, on'yomi, kun'yomi, stroke count, and at least two example words with readings and English translations.
 
 ---
 
@@ -54,7 +63,7 @@ KanjiApp/
 │
 ├── Models/
 │   ├── Kanji.swift             # Kanji & KanjiExample models, JLPTLevel enum
-│   ├── KanjiDatabase.swift     # Static database: 80 N5 + N4/N3/N2/N1 kanji
+│   ├── KanjiDatabase.swift     # Static database: 497 kanji across all JLPT levels
 │   └── SRSEngine.swift         # SM-2 algorithm, SRSCard model, ReviewRating enum
 │
 ├── Persistence/
