@@ -648,9 +648,6 @@ struct KanjiDatabase {
         Kanji(id:"覚", meanings:["remember","awaken"], onyomi:["カク"], kunyomi:["おぼ","さ"], level:.N4, strokeCount:12, examples:[
             KanjiExample(word:"覚える", reading:"おぼえる", meaning:"to remember"),
             KanjiExample(word:"目覚め", reading:"めざめ", meaning:"awakening")]),
-    ], onyomi:["ジャク"], kunyomi:["よわ"], level:.N4, strokeCount:10, examples:[
-            KanjiExample(word:"弱い", reading:"よわい", meaning:"weak"),
-            KanjiExample(word:"弱点", reading:"じゃくてん", meaning:"weak point")])
     ]
 
     // ─────────────────────────────────────────
@@ -960,9 +957,6 @@ struct KanjiDatabase {
         Kanji(id:"並", meanings:["line up"], onyomi:["ヘイ"], kunyomi:["なら"], level:.N3, strokeCount:8, examples:[
             KanjiExample(word:"並ぶ", reading:"ならぶ", meaning:"to line up"),
             KanjiExample(word:"並べる", reading:"ならべる", meaning:"to arrange")]),
-    ], onyomi:["ヘン"], kunyomi:["かえ"], level:.N3, strokeCount:7, examples:[
-            KanjiExample(word:"返す", reading:"かえす", meaning:"to return something"),
-            KanjiExample(word:"返事", reading:"へんじ", meaning:"reply")])
     ]
 
     // ─────────────────────────────────────────
@@ -1224,9 +1218,6 @@ struct KanjiDatabase {
         Kanji(id:"昇", meanings:["rise","ascend"], onyomi:["ショウ"], kunyomi:["のぼ"], level:.N2, strokeCount:8, examples:[
             KanjiExample(word:"上昇", reading:"じょうしょう", meaning:"rise / ascent"),
             KanjiExample(word:"昇進", reading:"しょうしん", meaning:"promotion")]),
-    ], onyomi:["セツ"], kunyomi:["もう"], level:.N2, strokeCount:11, examples:[
-            KanjiExample(word:"設備", reading:"せつび", meaning:"equipment"),
-            KanjiExample(word:"設定", reading:"せってい", meaning:"setting / configuration")])
     ]
 
     // ─────────────────────────────────────────
@@ -1533,8 +1524,5 @@ struct KanjiDatabase {
         Kanji(id:"魂", meanings:["soul","spirit"], onyomi:["コン"], kunyomi:["たましい"], level:.N1, strokeCount:14, examples:[
             KanjiExample(word:"魂", reading:"たましい", meaning:"soul"),
             KanjiExample(word:"霊魂", reading:"れいこん", meaning:"spirit / soul")]),
-    ], onyomi:["ボウ"], kunyomi:["さまた"], level:.N1, strokeCount:7, examples:[
-            KanjiExample(word:"妨げる", reading:"さまたげる", meaning:"to obstruct"),
-            KanjiExample(word:"妨害", reading:"ぼうがい", meaning:"obstruction / interference")])
     ]
 }
