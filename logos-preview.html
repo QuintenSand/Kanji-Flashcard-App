@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanji Flashcard App — Logo Concepts</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    background: #F2F2F7;
+    min-height: 100vh;
+    padding: 48px 24px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1C1C1E;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    text-align: center;
+    color: #8E8E93;
+    font-size: 15px;
+    margin-bottom: 48px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border-radius: 24px;
+    padding: 36px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+  }
+  .logo-wrap {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .logo-label {
+    font-size: 11px;
+    color: #8E8E93;
+    text-align: center;
+    margin-top: -8px;
+  }
+  .concept-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1C1C1E;
+  }
+  .concept-desc {
+    font-size: 13px;
+    color: #8E8E93;
+    text-align: center;
+    line-height: 1.5;
+    max-width: 260px;
+  }
+  .sizes { display: flex; gap: 16px; align-items: flex-end; justify-content: center; }
+  .size-label { font-size: 10px; color: #C7C7CC; text-align: center; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>漢字フラッシュカード — Logo Concepts</h1>
+<p class="subtitle">Five directions — pick your favourite</p>
+
+<div class="grid">
+
+  <!-- ══ CONCEPT 1: Classic Blue Flashcard ══ -->
+  <div class="card">
+    <div class="concept-title">① Classic Card</div>
+    <div class="concept-desc">Clean flashcard with a shadow stack, the kanji 字 (character/letter) centred in bold. Timeless, instantly communicates "flashcards".</div>
+    <div class="sizes">
+      <!-- 1024px version scaled to 180px -->
+      <div>
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="180" height="180" rx="40" fill="#007AFF"/>
+          <!-- shadow cards -->
+          <rect x="30" y="44" width="120" height="96" rx="14" fill="rgba(0,0,0,.18)" transform="rotate(-6 90 92)"/>
+          <rect x="30" y="44" width="120" height="96" rx="14" fill="rgba(0,0,0,.12)" transform="rotate(4 90 92)"/>
+          <!-- main card -->
+          <rect x="28" y="48" width="124" height="96" rx="14" fill="white"/>
+          <!-- kanji 字 -->
+          <text x="90" y="118" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="58" fill="#007AFF">字</text>
+          <!-- dot indicator -->
+          <circle cx="75" cy="134" r="3" fill="#E5E5EA"/>
+          <circle cx="90" cy="134" r="3" fill="#007AFF"/>
+          <circle cx="105" cy="134" r="3" fill="#E5E5EA"/>
+        </svg>
+        <div class="size-label">App Icon</div>
+      </div>
+      <div>
+        <svg width="60" height="60" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="180" height="180" rx="40" fill="#007AFF"/>
+          <rect x="30" y="44" width="120" height="96" rx="14" fill="rgba(0,0,0,.18)" transform="rotate(-6 90 92)"/>
+          <rect x="30" y="44" width="120" height="96" rx="14" fill="rgba(0,0,0,.12)" transform="rotate(4 90 92)"/>
+          <rect x="28" y="48" width="124" height="96" rx="14" fill="white"/>
+          <text x="90" y="118" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="58" fill="#007AFF">字</text>
+          <circle cx="75" cy="134" r="3" fill="#E5E5EA"/>
+          <circle cx="90" cy="134" r="3" fill="#007AFF"/>
+          <circle cx="105" cy="134" r="3" fill="#E5E5EA"/>
+        </svg>
+        <div class="size-label">60pt</div>
+      </div>
+      <div>
+        <svg width="32" height="32" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="180" height="180" rx="40" fill="#007AFF"/>
+          <rect x="30" y="44" width="120" height="96" rx="14" fill="rgba(0,0,0,.18)" transform="rotate(-6 90 92)"/>
+          <rect x="30" y="44" width="120" height="96" rx="14" fill="rgba(0,0,0,.12)" transform="rotate(4 90 92)"/>
+          <rect x="28" y="48" width="124" height="96" rx="14" fill="white"/>
+          <text x="90" y="118" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="58" fill="#007AFF">字</text>
+          <circle cx="75" cy="134" r="3" fill="#E5E5EA"/>
+          <circle cx="90" cy="134" r="3" fill="#007AFF"/>
+          <circle cx="105" cy="134" r="3" fill="#E5E5EA"/>
+        </svg>
+        <div class="size-label">29pt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONCEPT 2: Ink Brush ══ -->
+  <div class="card">
+    <div class="concept-title">② Ink Brush</div>
+    <div class="concept-desc">Deep navy with a bold brush-stroke circle behind the kanji 学 (study/learn). Nods to traditional Japanese ink painting — elegant and distinctive.</div>
+    <div class="sizes">
+      <div>
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="180" height="180" rx="40" fill="#1A1A2E"/>
+          <!-- brush stroke circle (hand-drawn feel) -->
+          <ellipse cx="90" cy="88" rx="58" ry="56" stroke="white" stroke-width="7" stroke-linecap="round" stroke-dasharray="1 0" opacity="0.90" fill="none"
+            transform="rotate(-8 90 88)"/>
+          <!-- kanji 学 -->
+          <text x="90" y="115" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="66" fill="white">学</text>
+          <!-- red hanko-style dot -->
+          <rect x="118" y="118" width="22" height="22" rx="4" fill="#FF3B30" opacity="0.9"/>
+          <text x="129" y="133" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="12" fill="white">印</text>
+        </svg>
+        <div class="size-label">App Icon</div>
+      </div>
+      <div>
+        <svg width="60" height="60" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="180" height="180" rx="40" fill="#1A1A2E"/>
+          <ellipse cx="90" cy="88" rx="58" ry="56" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.9" transform="rotate(-8 90 88)"/>
+          <text x="90" y="115" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="66" fill="white">学</text>
+          <rect x="118" y="118" width="22" height="22" rx="4" fill="#FF3B30" opacity="0.9"/>
+          <text x="129" y="133" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="12" fill="white">印</text>
+        </svg>
+        <div class="size-label">60pt</div>
+      </div>
+      <div>
+        <svg width="32" height="32" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="180" height="180" rx="40" fill="#1A1A2E"/>
+          <ellipse cx="90" cy="88" rx="58" ry="56" stroke="white" stroke-width="7" stroke-linecap="round" fill="none" opacity="0.9" transform="rotate(-8 90 88)"/>
+          <text x="90" y="115" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="66" fill="white">学</text>
+          <rect x="118" y="118" width="22" height="22" rx="4" fill="#FF3B30" opacity="0.9"/>
+          <text x="129" y="133" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="12" fill="white">印</text>
+        </svg>
+        <div class="size-label">29pt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONCEPT 3: Gradient Sunrise ══ -->
+  <div class="card">
+    <div class="concept-title">③ Rising Sun</div>
+    <div class="concept-desc">Warm red-to-orange gradient — echoing the Japanese flag's rising sun — with 漢 (Han/kanji) in white. Modern, energetic, memorable.</div>
+    <div class="sizes">
+      <div>
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FF3B30"/>
+              <stop offset="1" stop-color="#FF9500"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g1)"/>
+          <!-- sun rays -->
+          <circle cx="90" cy="90" r="42" fill="rgba(255,255,255,.15)"/>
+          <!-- kanji 漢 -->
+          <text x="90" y="118" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="74" fill="white">漢</text>
+        </svg>
+        <div class="size-label">App Icon</div>
+      </div>
+      <div>
+        <svg width="60" height="60" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g1b" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FF3B30"/>
+              <stop offset="1" stop-color="#FF9500"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g1b)"/>
+          <circle cx="90" cy="90" r="42" fill="rgba(255,255,255,.15)"/>
+          <text x="90" y="118" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="74" fill="white">漢</text>
+        </svg>
+        <div class="size-label">60pt</div>
+      </div>
+      <div>
+        <svg width="32" height="32" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g1c" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FF3B30"/>
+              <stop offset="1" stop-color="#FF9500"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g1c)"/>
+          <circle cx="90" cy="90" r="42" fill="rgba(255,255,255,.15)"/>
+          <text x="90" y="118" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="74" fill="white">漢</text>
+        </svg>
+        <div class="size-label">29pt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONCEPT 4: Purple SRS Brain ══ -->
+  <div class="card">
+    <div class="concept-title">④ Memory Arc</div>
+    <div class="concept-desc">Purple-to-indigo gradient with an arc representing the spaced-repetition curve. The kanji 習 (practice/learn) sits at the peak. Highlights the SRS concept.</div>
+    <div class="sizes">
+      <div>
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g2" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#AF52DE"/>
+              <stop offset="1" stop-color="#5856D6"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g2)"/>
+          <!-- SRS arc curve -->
+          <path d="M 32 130 Q 55 55 90 52 Q 125 55 148 130"
+            stroke="rgba(255,255,255,0.30)" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <!-- dot at peak -->
+          <circle cx="90" cy="52" r="7" fill="white" opacity="0.9"/>
+          <!-- kanji 習 -->
+          <text x="90" y="124" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="62" fill="white">習</text>
+        </svg>
+        <div class="size-label">App Icon</div>
+      </div>
+      <div>
+        <svg width="60" height="60" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g2b" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#AF52DE"/>
+              <stop offset="1" stop-color="#5856D6"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g2b)"/>
+          <path d="M 32 130 Q 55 55 90 52 Q 125 55 148 130" stroke="rgba(255,255,255,0.30)" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle cx="90" cy="52" r="7" fill="white" opacity="0.9"/>
+          <text x="90" y="124" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="62" fill="white">習</text>
+        </svg>
+        <div class="size-label">60pt</div>
+      </div>
+      <div>
+        <svg width="32" height="32" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g2c" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#AF52DE"/>
+              <stop offset="1" stop-color="#5856D6"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g2c)"/>
+          <path d="M 32 130 Q 55 55 90 52 Q 125 55 148 130" stroke="rgba(255,255,255,0.30)" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle cx="90" cy="52" r="7" fill="white" opacity="0.9"/>
+          <text x="90" y="124" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="62" fill="white">習</text>
+        </svg>
+        <div class="size-label">29pt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONCEPT 5: Teal Minimal ══ -->
+  <div class="card">
+    <div class="concept-title">⑤ Minimal Teal</div>
+    <div class="concept-desc">Cool teal-to-cyan gradient. Ultra-minimal — just the kanji 漢 in a clean, modern sans style. No decoration, maximum clarity at every size.</div>
+    <div class="sizes">
+      <div>
+        <svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g3" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#30B0C7"/>
+              <stop offset="1" stop-color="#34C759"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g3)"/>
+          <!-- subtle grid lines suggesting kanji stroke order -->
+          <line x1="90" y1="24" x2="90" y2="156" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+          <line x1="24" y1="90" x2="156" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+          <!-- kanji 漢 -->
+          <text x="90" y="120" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="80" fill="white" font-weight="300">漢</text>
+        </svg>
+        <div class="size-label">App Icon</div>
+      </div>
+      <div>
+        <svg width="60" height="60" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g3b" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#30B0C7"/>
+              <stop offset="1" stop-color="#34C759"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g3b)"/>
+          <line x1="90" y1="24" x2="90" y2="156" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+          <line x1="24" y1="90" x2="156" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+          <text x="90" y="120" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="80" fill="white" font-weight="300">漢</text>
+        </svg>
+        <div class="size-label">60pt</div>
+      </div>
+      <div>
+        <svg width="32" height="32" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="g3c" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#30B0C7"/>
+              <stop offset="1" stop-color="#34C759"/>
+            </linearGradient>
+          </defs>
+          <rect width="180" height="180" rx="40" fill="url(#g3c)"/>
+          <line x1="90" y1="24" x2="90" y2="156" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+          <line x1="24" y1="90" x2="156" y2="90" stroke="rgba(255,255,255,.15)" stroke-width="1.5"/>
+          <text x="90" y="120" text-anchor="middle" font-family="Hiragino Mincho ProN, serif" font-size="80" fill="white" font-weight="300">漢</text>
+        </svg>
+        <div class="size-label">29pt</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p style="text-align:center; color:#C7C7CC; font-size:12px; margin-top:48px;">
+  Each logo is shown at App Icon (180px), 60pt, and 29pt sizes — the three most common iOS icon slots.
+</p>
+
+</body>
+</html>
