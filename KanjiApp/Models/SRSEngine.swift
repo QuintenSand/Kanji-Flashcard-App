@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - SRS Card (per-kanji review state)
-struct SRSCard: Codable, Identifiable {
+struct SRSCard: Codable, Identifiable, Equatable {
     var id: String              // kanji character
     var easeFactor: Double      // SM-2 ease factor (starts 2.5)
     var interval: Int           // days until next review
