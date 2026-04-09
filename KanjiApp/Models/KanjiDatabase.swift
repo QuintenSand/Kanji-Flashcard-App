@@ -423,7 +423,7 @@ struct KanjiDatabase {
         Kanji(id:"弱", meanings:["weak"], onyomi:["ジャク"], kunyomi:["よわ"], level:.N4, strokeCount:10, examples:[
             KanjiExample(word:"弱い", reading:"よわい", meaning:"weak"),
             KanjiExample(word:"弱点", reading:"じゃくてん", meaning:"weak point")]),
-Kanji(id:"急", meanings:["urgent","hurry"], onyomi:["キュウ"], kunyomi:["いそ"], level:.N4, strokeCount:9, examples:[
+        Kanji(id:"急", meanings:["urgent","hurry"], onyomi:["キュウ"], kunyomi:["いそ"], level:.N4, strokeCount:9, examples:[
             KanjiExample(word:"急ぐ", reading:"いそぐ", meaning:"to hurry"),
             KanjiExample(word:"緊急", reading:"きんきゅう", meaning:"emergency")]),
         Kanji(id:"運", meanings:["carry","luck"], onyomi:["ウン"], kunyomi:["はこ"], level:.N4, strokeCount:12, examples:[
@@ -717,7 +717,7 @@ Kanji(id:"急", meanings:["urgent","hurry"], onyomi:["キュウ"], kunyomi:["い
         Kanji(id:"返", meanings:["return","reply"], onyomi:["ヘン"], kunyomi:["かえ"], level:.N3, strokeCount:7, examples:[
             KanjiExample(word:"返す", reading:"かえす", meaning:"to return something"),
             KanjiExample(word:"返事", reading:"へんじ", meaning:"reply")]),
-Kanji(id:"愛", meanings:["love","affection"], onyomi:["アイ"], kunyomi:["めで"], level:.N3, strokeCount:13, examples:[
+        Kanji(id:"愛", meanings:["love","affection"], onyomi:["アイ"], kunyomi:["めで"], level:.N3, strokeCount:13, examples:[
             KanjiExample(word:"愛", reading:"あい", meaning:"love"),
             KanjiExample(word:"愛情", reading:"あいじょう", meaning:"affection")]),
         Kanji(id:"悲", meanings:["sad","grieve"], onyomi:["ヒ"], kunyomi:["かな"], level:.N3, strokeCount:12, examples:[
@@ -996,7 +996,7 @@ Kanji(id:"愛", meanings:["love","affection"], onyomi:["アイ"], kunyomi:["め�
         Kanji(id:"設", meanings:["establish","set up"], onyomi:["セツ"], kunyomi:["もう"], level:.N2, strokeCount:11, examples:[
             KanjiExample(word:"設備", reading:"せつび", meaning:"equipment"),
             KanjiExample(word:"設定", reading:"せってい", meaning:"setting / configuration")]),
-Kanji(id:"能", meanings:["ability","talent"], onyomi:["ノウ"], kunyomi:[], level:.N2, strokeCount:10, examples:[
+        Kanji(id:"能", meanings:["ability","talent"], onyomi:["ノウ"], kunyomi:[], level:.N2, strokeCount:10, examples:[
             KanjiExample(word:"可能", reading:"かのう", meaning:"possible"),
             KanjiExample(word:"能力", reading:"のうりょく", meaning:"ability")]),
         Kanji(id:"効", meanings:["effect","valid"], onyomi:["コウ"], kunyomi:["き"], level:.N2, strokeCount:8, examples:[
@@ -1275,7 +1275,7 @@ Kanji(id:"能", meanings:["ability","talent"], onyomi:["ノウ"], kunyomi:[], le
         Kanji(id:"妨", meanings:["disturb","obstruct"], onyomi:["ボウ"], kunyomi:["さまた"], level:.N1, strokeCount:7, examples:[
             KanjiExample(word:"妨げる", reading:"さまたげる", meaning:"to obstruct"),
             KanjiExample(word:"妨害", reading:"ぼうがい", meaning:"obstruction / interference")]),
-Kanji(id:"鑑", meanings:["mirror","appreciate"], onyomi:["カン"], kunyomi:["かがみ"], level:.N1, strokeCount:23, examples:[
+        Kanji(id:"鑑", meanings:["mirror","appreciate"], onyomi:["カン"], kunyomi:["かがみ"], level:.N1, strokeCount:23, examples:[
             KanjiExample(word:"鑑賞", reading:"かんしょう", meaning:"appreciation"),
             KanjiExample(word:"図鑑", reading:"ずかん", meaning:"illustrated reference book")]),
         Kanji(id:"賞", meanings:["prize","appreciate"], onyomi:["ショウ"], kunyomi:[], level:.N1, strokeCount:15, examples:[
