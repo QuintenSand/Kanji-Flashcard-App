@@ -49,14 +49,36 @@ function Phone({ children, activeTab, onTab }) {
 
 // ── Library screen ──────────────────────────────────────────────────────────
 const sampleKanji = [
-  { c:"日", m:"sun",   lv:"N5", st:4  },{ c:"月", m:"moon",  lv:"N5", st:4  },
-  { c:"火", m:"fire",  lv:"N5", st:4  },{ c:"水", m:"water", lv:"N5", st:4  },
-  { c:"木", m:"tree",  lv:"N5", st:4  },{ c:"金", m:"gold",  lv:"N5", st:8  },
-  { c:"山", m:"mountain",lv:"N5",st:3 },{ c:"川", m:"river", lv:"N5", st:3  },
-  { c:"人", m:"person",lv:"N5", st:2  },{ c:"口", m:"mouth", lv:"N5", st:3  },
-  { c:"目", m:"eye",   lv:"N5", st:5  },{ c:"手", m:"hand",  lv:"N5", st:4  },
-  { c:"足", m:"foot",  lv:"N4", st:7  },{ c:"耳", m:"ear",   lv:"N4", st:6  },
-  { c:"心", m:"heart", lv:"N3", st:4  },{ c:"力", m:"power", lv:"N4", st:2  },
+  // N5
+  { c:"日", m:"sun",      lv:"N5" },{ c:"月", m:"moon",     lv:"N5" },
+  { c:"火", m:"fire",     lv:"N5" },{ c:"水", m:"water",    lv:"N5" },
+  { c:"木", m:"tree",     lv:"N5" },{ c:"金", m:"gold",     lv:"N5" },
+  { c:"土", m:"earth",    lv:"N5" },{ c:"山", m:"mountain", lv:"N5" },
+  { c:"川", m:"river",    lv:"N5" },{ c:"田", m:"rice field",lv:"N5" },
+  { c:"人", m:"person",   lv:"N5" },{ c:"口", m:"mouth",    lv:"N5" },
+  { c:"目", m:"eye",      lv:"N5" },{ c:"耳", m:"ear",      lv:"N5" },
+  { c:"手", m:"hand",     lv:"N5" },{ c:"足", m:"foot",     lv:"N5" },
+  { c:"力", m:"power",    lv:"N5" },{ c:"大", m:"big",      lv:"N5" },
+  { c:"小", m:"small",    lv:"N5" },{ c:"中", m:"middle",   lv:"N5" },
+  { c:"上", m:"up",       lv:"N5" },{ c:"下", m:"down",     lv:"N5" },
+  { c:"左", m:"left",     lv:"N5" },{ c:"右", m:"right",    lv:"N5" },
+  { c:"本", m:"book",     lv:"N5" },{ c:"子", m:"child",    lv:"N5" },
+  { c:"女", m:"woman",    lv:"N5" },{ c:"男", m:"man",      lv:"N5" },
+  { c:"学", m:"study",    lv:"N5" },{ c:"生", m:"life",     lv:"N5" },
+  // N4
+  { c:"心", m:"heart",    lv:"N4" },{ c:"体", m:"body",     lv:"N4" },
+  { c:"頭", m:"head",     lv:"N4" },{ c:"顔", m:"face",     lv:"N4" },
+  { c:"声", m:"voice",    lv:"N4" },{ c:"音", m:"sound",    lv:"N4" },
+  { c:"色", m:"color",    lv:"N4" },{ c:"形", m:"shape",    lv:"N4" },
+  { c:"数", m:"number",   lv:"N4" },{ c:"時", m:"time",     lv:"N4" },
+  // N3
+  { c:"愛", m:"love",     lv:"N3" },{ c:"感", m:"feeling",  lv:"N3" },
+  { c:"夢", m:"dream",    lv:"N3" },{ c:"希", m:"hope",     lv:"N3" },
+  { c:"望", m:"wish",     lv:"N3" },{ c:"笑", m:"laugh",    lv:"N3" },
+  // N2
+  { c:"概", m:"outline",  lv:"N2" },{ c:"複", m:"complex",  lv:"N2" },
+  // N1
+  { c:"叡", m:"wisdom",   lv:"N1" },{ c:"璧", m:"jewel",    lv:"N1" },
 ];
 
 function LibraryScreen() {
@@ -67,7 +89,7 @@ function LibraryScreen() {
     (filter === "All" || k.lv === filter) &&
     (search === "" || k.m.includes(search) || k.c.includes(search))
   );
-  const statuses = ["mastered","learned","learned","new","mastered","learned","new","learned","mastered","new","learned","mastered","new","new","new","new"];
+  const statuses = ["mastered","learned","learned","new","mastered","learned","new","learned","mastered","new","learned","mastered","new","new","mastered","learned","new","learned","mastered","new","learned","new","mastered","learned","new","learned","new","mastered","learned","new","learned","new","new","mastered","new","new","new","new","new","new","new","new","new","new","new","new","new","new","new","new"];
 
   return (
     <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -90,20 +112,22 @@ function LibraryScreen() {
           ))}
         </div>
       </div>
-      <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: 12,
-        display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, alignContent: "start" }}>
-        {visible.map((k, i) => {
-          const st = statuses[i % statuses.length];
-          const border = st === "mastered" ? "#34C759" : st === "learned" ? ACCENT : "#D1D1D6";
-          return (
-            <div key={k.c} style={{ background: "#fff", borderRadius: 14,
-              border: `2px solid ${border}`, display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center", padding: "8px 4px", gap: 2 }}>
-              <span style={{ fontSize: 28, lineHeight: 1 }}>{k.c}</span>
-              <span style={{ fontSize: 9, color: "#8E8E93", textAlign: "center" }}>{k.m}</span>
-            </div>
-          );
-        })}
+      {/* Scroll wrapper — must NOT also be the grid */}
+      <div style={{ flex: 1, minHeight: 0, overflowY: "scroll", WebkitOverflowScrolling: "touch" }}>
+        <div style={{ padding: 12, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, alignContent: "start" }}>
+          {visible.map((k, i) => {
+            const st = statuses[i % statuses.length];
+            const border = st === "mastered" ? "#34C759" : st === "learned" ? ACCENT : "#D1D1D6";
+            return (
+              <div key={k.c} style={{ background: "#fff", borderRadius: 14,
+                border: `2px solid ${border}`, display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "center", padding: "8px 4px", gap: 2 }}>
+                <span style={{ fontSize: 28, lineHeight: 1 }}>{k.c}</span>
+                <span style={{ fontSize: 9, color: "#8E8E93", textAlign: "center" }}>{k.m}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -121,7 +145,7 @@ function StudyScreen({ onStartSession }) {
   const due = 12;
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "0 0 8px" }}>
+    <div style={{ flex: 1, minHeight: 0, overflowY: "scroll", WebkitOverflowScrolling: "touch", padding: "0 0 8px" }}>
       <div style={{ background: "#fff", padding: "8px 16px 12px" }}>
         <div style={{ fontSize: 28, fontWeight: 700 }}>Study</div>
       </div>
@@ -305,7 +329,7 @@ function StatsScreen() {
   const heatmap = Array.from({ length: 84 }, (_, i) => Math.random() > 0.55);
 
   return (
-    <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+    <div style={{ flex: 1, minHeight: 0, overflowY: "scroll", WebkitOverflowScrolling: "touch" }}>
       <div style={{ background: "#fff", padding: "8px 16px 12px" }}>
         <div style={{ fontSize: 28, fontWeight: 700 }}>Statistics</div>
       </div>
