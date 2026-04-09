@@ -77,6 +77,9 @@ struct LibraryView: View {
                         }
                         .padding()
                     }
+                    // Without maxHeight: .infinity the VStack gives ScrollView its full
+                    // content height, so SwiftUI thinks there is nothing to scroll.
+                    .frame(maxHeight: .infinity)
                 }
             }
             .navigationTitle("Library")
