@@ -6,8 +6,10 @@ struct StudyView: View {
     @State private var showLevelPicker = false
     @State private var showSession    = false
 
+    private let sessionSizeOptions = [5, 10, 15, 20]
+
     private var dueKanji: [Kanji] {
-        SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: 30)
+        SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: appState.sessionSize)
     }
 
     var body: some View {
@@ -42,6 +44,31 @@ struct StudyView: View {
                             }
                             .padding(.horizontal)
                         }
+                    }
+
+                    // ── Session size picker
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Cards per session")
+                            .font(.headline)
+                            .padding(.horizontal)
+
+                        HStack(spacing: 10) {
+                            ForEach(sessionSizeOptions, id: \.self) { size in
+                                let isSelected = appState.sessionSize == size
+                                Button {
+                                    appState.sessionSize = size
+                                } label: {
+                                    Text("\(size)")
+                                        .font(.subheadline.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 10)
+                                        .background(isSelected ? Color.accentColor : Color(.systemGray5))
+                                        .foregroundStyle(isSelected ? .white : .primary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
                     }
 
                     // ── Start session button

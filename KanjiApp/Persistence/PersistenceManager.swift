@@ -24,6 +24,11 @@ final class AppState: ObservableObject {
         didSet { save() }
     }
 
+    // ── Session size preference (cards per review)
+    @Published var sessionSize: Int = 10 {
+        didSet { defaults.set(sessionSize, forKey: Keys.sessionSize) }
+    }
+
     // ── Notification preferences
     @Published var notificationsEnabled: Bool = false {
         didSet {
@@ -51,6 +56,7 @@ final class AppState: ObservableObject {
         static let studyDates           = "study_dates_v1"
         static let sessionHistory       = "session_history_v1"
         static let selectedLevels       = "selected_levels_v1"
+        static let sessionSize          = "session_size_v1"
         static let notificationsEnabled = "notifications_enabled_v1"
         static let notificationHour     = "notification_hour_v1"
         static let notificationMinute   = "notification_minute_v1"
@@ -185,6 +191,7 @@ final class AppState: ObservableObject {
             selectedLevels = Set(raws.compactMap { JLPTLevel(rawValue: $0) })
             if selectedLevels.isEmpty { selectedLevels = [.N5] }
         }
+        sessionSize          = defaults.object(forKey: Keys.sessionSize)         as? Int ?? 10
         notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
         notificationHour     = defaults.object(forKey: Keys.notificationHour)   as? Int ?? 9
         notificationMinute   = defaults.object(forKey: Keys.notificationMinute) as? Int ?? 0

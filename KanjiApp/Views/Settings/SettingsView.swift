@@ -72,6 +72,16 @@ struct SettingsView: View {
                     }
                 }
 
+                // ── Study section ──────────────────────────────────────────
+                Section("Study") {
+                    Picker("Cards per session", selection: $appState.sessionSize) {
+                        ForEach([5, 10, 15, 20], id: \.self) { n in
+                            Text("\(n)").tag(n)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
                 // ── About section ──────────────────────────────────────────
                 Section("About") {
                     LabeledContent("Version", value: "1.0")
