@@ -27,7 +27,7 @@ struct SettingsView: View {
                                 .foregroundStyle(.white)
                         }
                         Toggle("Daily Reminder", isOn: $appState.notificationsEnabled)
-                            .onChange(of: appState.notificationsEnabled) { _, enabled in
+                            .onChange(of: appState.notificationsEnabled) { enabled in
                                 handleToggle(enabled)
                             }
                     }
@@ -48,7 +48,7 @@ struct SettingsView: View {
                                 selection: $notificationTime,
                                 displayedComponents: .hourAndMinute
                             )
-                            .onChange(of: notificationTime) { _, newTime in
+                            .onChange(of: notificationTime) { newTime in
                                 let cal = Calendar.current
                                 appState.notificationHour   = cal.component(.hour,   from: newTime)
                                 appState.notificationMinute = cal.component(.minute, from: newTime)
