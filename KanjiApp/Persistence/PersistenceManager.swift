@@ -24,13 +24,36 @@ final class AppState: ObservableObject {
         didSet { save() }
     }
 
+    // ── Notification preferences
+    @Published var notificationsEnabled: Bool = false {
+        didSet {
+            defaults.set(notificationsEnabled, forKey: Keys.notificationsEnabled)
+            rescheduleNotification()
+        }
+    }
+    @Published var notificationHour: Int = 9 {
+        didSet {
+            defaults.set(notificationHour, forKey: Keys.notificationHour)
+            rescheduleNotification()
+        }
+    }
+    @Published var notificationMinute: Int = 0 {
+        didSet {
+            defaults.set(notificationMinute, forKey: Keys.notificationMinute)
+            rescheduleNotification()
+        }
+    }
+
     // ─────────────────────────────────────────────────────
     private let defaults = UserDefaults.standard
     private enum Keys {
-        static let cards          = "srs_cards_v1"
-        static let studyDates     = "study_dates_v1"
-        static let sessionHistory = "session_history_v1"
-        static let selectedLevels = "selected_levels_v1"
+        static let cards                = "srs_cards_v1"
+        static let studyDates           = "study_dates_v1"
+        static let sessionHistory       = "session_history_v1"
+        static let selectedLevels       = "selected_levels_v1"
+        static let notificationsEnabled = "notifications_enabled_v1"
+        static let notificationHour     = "notification_hour_v1"
+        static let notificationMinute   = "notification_minute_v1"
     }
 
     init() { load() }
@@ -77,7 +100,6 @@ final class AppState: ObservableObject {
     }
 
     var masteredCount: Int {
-        // card with interval >= 21 days is "mastered"
         cards.values.filter { $0.interval >= 21 }.count
     }
 
@@ -118,6 +140,19 @@ final class AppState: ObservableObject {
         }
     }
 
+    // MARK: - Notifications
+    func rescheduleNotification() {
+        if notificationsEnabled {
+            NotificationManager.shared.scheduleDailyReminder(
+                hour:      notificationHour,
+                minute:    notificationMinute,
+                dueCount:  dueCount
+            )
+        } else {
+            NotificationManager.shared.cancelDailyReminder()
+        }
+    }
+
     // MARK: - Persistence
     private func save() {
         if let data = try? JSONEncoder().encode(cards) {
@@ -150,6 +185,9 @@ final class AppState: ObservableObject {
             selectedLevels = Set(raws.compactMap { JLPTLevel(rawValue: $0) })
             if selectedLevels.isEmpty { selectedLevels = [.N5] }
         }
+        notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
+        notificationHour     = defaults.object(forKey: Keys.notificationHour)   as? Int ?? 9
+        notificationMinute   = defaults.object(forKey: Keys.notificationMinute) as? Int ?? 0
     }
 }
 
