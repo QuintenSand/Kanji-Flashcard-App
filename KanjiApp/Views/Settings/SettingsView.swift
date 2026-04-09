@@ -82,35 +82,6 @@ struct SettingsView: View {
                     .pickerStyle(.segmented)
                 }
 
-                // ── iCloud section ─────────────────────────────────────────
-                Section {
-                    HStack(spacing: 14) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.blue.gradient)
-                                .frame(width: 36, height: 36)
-                            Image(systemName: "icloud.fill")
-                                .font(.system(size: 17))
-                                .foregroundStyle(.white)
-                        }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("iCloud Sync")
-                                .font(.body)
-                            Text(appState.iCloudAvailable ? "Active — progress syncs across your devices" : "Not available — sign in to iCloud in Settings")
-                                .font(.caption)
-                                .foregroundStyle(appState.iCloudAvailable ? .green : .secondary)
-                        }
-                        Spacer()
-                        Image(systemName: appState.iCloudAvailable ? "checkmark.circle.fill" : "xmark.circle.fill")
-                            .foregroundStyle(appState.iCloudAvailable ? .green : Color(.systemGray3))
-                    }
-                } header: {
-                    Text("Sync")
-                } footer: {
-                    Text("SRS progress, study dates, and session history are synced automatically via your iCloud account. Notification preferences stay local to this device.")
-                        .font(.caption)
-                }
-
                 // ── About section ──────────────────────────────────────────
                 Section("About") {
                     LabeledContent("Version", value: "1.0")

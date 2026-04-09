@@ -1,18 +1,7 @@
 import Foundation
 import Combine
 
-// MARK: - App State (ObservableObject, persisted via UserDefaults + iCloud KV Store)
-//
-// Strategy:
-//   • UserDefaults  — local cache, instant reads, works offline
-//   • NSUbiquitousKeyValueStore (iCloud) — cloud backup & cross-device sync
-//
-// On every save we write to both stores.
-// When iCloud pushes an external change we merge it into UserDefaults
-// and refresh the published properties so the UI updates automatically.
-//
-// ⚠️  Requires "iCloud → Key-value storage" capability in Xcode:
-//     Project → KanjiApp target → Signing & Capabilities → + Capability → iCloud → ✓ Key-value storage
+// MARK: - App State (ObservableObject, persisted via UserDefaults)
 
 final class AppState: ObservableObject {
 
@@ -38,14 +27,10 @@ final class AppState: ObservableObject {
 
     // ── Session size preference (cards per review)
     @Published var sessionSize: Int = 10 {
-        didSet {
-            defaults.set(sessionSize, forKey: Keys.sessionSize)
-            icloud.set(sessionSize,   forKey: Keys.sessionSize)
-            icloud.synchronize()
-        }
+        didSet { defaults.set(sessionSize, forKey: Keys.sessionSize) }
     }
 
-    // ── Notification preferences (local only — not synced to iCloud)
+    // ── Notification preferences
     @Published var notificationsEnabled: Bool = false {
         didSet {
             defaults.set(notificationsEnabled, forKey: Keys.notificationsEnabled)
@@ -65,12 +50,8 @@ final class AppState: ObservableObject {
         }
     }
 
-    // ── iCloud sync status (shown in Settings)
-    @Published var iCloudAvailable: Bool = false
-
     // ─────────────────────────────────────────────────────
     private let defaults = UserDefaults.standard
-    private let icloud   = NSUbiquitousKeyValueStore.default
 
     private enum Keys {
         static let cards                = "srs_cards_v1"
@@ -83,10 +64,7 @@ final class AppState: ObservableObject {
         static let notificationMinute   = "notification_minute_v1"
     }
 
-    init() {
-        load()
-        startICloudSync()
-    }
+    init() { load() }
 
     // MARK: - Computed stats
 
@@ -173,128 +151,30 @@ final class AppState: ObservableObject {
         }
     }
 
-    // MARK: - Persistence (local + iCloud)
+    // MARK: - Persistence
 
     private func save() {
-        // Encode the three main data blobs
-        let cardsData   = try? JSONEncoder().encode(cards)
-        let datesData   = try? JSONEncoder().encode(studyDates)
-        let historyData = try? JSONEncoder().encode(sessionHistory)
-        let levelRaws   = selectedLevels.map { $0.rawValue }
-
-        // ── Write to UserDefaults (local, instant)
-        if let d = cardsData   { defaults.set(d, forKey: Keys.cards) }
-        if let d = datesData   { defaults.set(d, forKey: Keys.studyDates) }
-        if let d = historyData { defaults.set(d, forKey: Keys.sessionHistory) }
-        defaults.set(levelRaws, forKey: Keys.selectedLevels)
-
-        // ── Write to iCloud KV Store (syncs when network available)
-        guard iCloudAvailable else { return }
-        if let d = cardsData   { icloud.set(d,         forKey: Keys.cards) }
-        if let d = datesData   { icloud.set(d,         forKey: Keys.studyDates) }
-        if let d = historyData { icloud.set(d,         forKey: Keys.sessionHistory) }
-        icloud.set(levelRaws,  forKey: Keys.selectedLevels)
-        icloud.synchronize()
+        if let d = try? JSONEncoder().encode(cards)         { defaults.set(d, forKey: Keys.cards) }
+        if let d = try? JSONEncoder().encode(studyDates)    { defaults.set(d, forKey: Keys.studyDates) }
+        if let d = try? JSONEncoder().encode(sessionHistory){ defaults.set(d, forKey: Keys.sessionHistory) }
+        defaults.set(selectedLevels.map { $0.rawValue }, forKey: Keys.selectedLevels)
     }
 
     private func load() {
-        // Try iCloud first (more up-to-date if user just reinstalled),
-        // fall back to UserDefaults if iCloud has nothing yet.
-        iCloudAvailable = FileManager.default.ubiquityIdentityToken != nil
-
-        func data(forKey key: String) -> Data? {
-            if iCloudAvailable, let d = icloud.data(forKey: key) { return d }
-            return defaults.data(forKey: key)
-        }
-
-        if let d = data(forKey: Keys.cards),
-           let decoded = try? JSONDecoder().decode([String: SRSCard].self, from: d) {
-            cards = decoded
-        }
-        if let d = data(forKey: Keys.studyDates),
-           let decoded = try? JSONDecoder().decode([Date].self, from: d) {
-            studyDates = decoded
-        }
-        if let d = data(forKey: Keys.sessionHistory),
-           let decoded = try? JSONDecoder().decode([StudySession].self, from: d) {
-            sessionHistory = decoded
-        }
-
-        let cloudLevels   = iCloudAvailable ? icloud.array(forKey: Keys.selectedLevels) as? [String] : nil
-        let defaultLevels = defaults.stringArray(forKey: Keys.selectedLevels)
-        if let raws = cloudLevels ?? defaultLevels {
+        if let d = defaults.data(forKey: Keys.cards),
+           let v = try? JSONDecoder().decode([String: SRSCard].self, from: d)   { cards = v }
+        if let d = defaults.data(forKey: Keys.studyDates),
+           let v = try? JSONDecoder().decode([Date].self, from: d)              { studyDates = v }
+        if let d = defaults.data(forKey: Keys.sessionHistory),
+           let v = try? JSONDecoder().decode([StudySession].self, from: d)      { sessionHistory = v }
+        if let raws = defaults.stringArray(forKey: Keys.selectedLevels) {
             selectedLevels = Set(raws.compactMap { JLPTLevel(rawValue: $0) })
             if selectedLevels.isEmpty { selectedLevels = [.N5] }
         }
-
-        let cloudSize = iCloudAvailable ? icloud.object(forKey: Keys.sessionSize) as? Int : nil
-        sessionSize          = cloudSize ?? defaults.object(forKey: Keys.sessionSize) as? Int ?? 10
+        sessionSize          = defaults.object(forKey: Keys.sessionSize)         as? Int ?? 10
         notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
-        notificationHour     = defaults.object(forKey: Keys.notificationHour)   as? Int ?? 9
-        notificationMinute   = defaults.object(forKey: Keys.notificationMinute) as? Int ?? 0
-    }
-
-    // MARK: - iCloud external change listener
-
-    private func startICloudSync() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(iCloudDidChange(_:)),
-            name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
-            object: icloud
-        )
-        // Kick off an initial sync fetch
-        icloud.synchronize()
-    }
-
-    @objc private func iCloudDidChange(_ notification: Notification) {
-        // Run on the main thread so @Published updates hit the UI
-        DispatchQueue.main.async { [weak self] in
-            self?.mergeFromICloud()
-        }
-    }
-
-    /// Merge fresh iCloud values into the local state.
-    /// Uses a "most-data-wins" strategy for cards and studyDates.
-    private func mergeFromICloud() {
-        // Cards — keep whichever side has the higher review count per kanji
-        if let d = icloud.data(forKey: Keys.cards),
-           let cloudCards = try? JSONDecoder().decode([String: SRSCard].self, from: d) {
-            var merged = cards
-            for (id, cloudCard) in cloudCards {
-                if let local = merged[id] {
-                    merged[id] = local.totalReviews >= cloudCard.totalReviews ? local : cloudCard
-                } else {
-                    merged[id] = cloudCard
-                }
-            }
-            if merged != cards { cards = merged }
-        }
-
-        // Study dates — union of both sets
-        if let d = icloud.data(forKey: Keys.studyDates),
-           let cloudDates = try? JSONDecoder().decode([Date].self, from: d) {
-            let calendar = Calendar.current
-            var merged = studyDates
-            for date in cloudDates {
-                if !merged.contains(where: { calendar.isDate($0, inSameDayAs: date) }) {
-                    merged.append(date)
-                }
-            }
-            if merged.count != studyDates.count { studyDates = merged }
-        }
-
-        // Session history — union, capped at 200
-        if let d = icloud.data(forKey: Keys.sessionHistory),
-           let cloudHistory = try? JSONDecoder().decode([StudySession].self, from: d) {
-            let existingIDs = Set(sessionHistory.map { $0.id })
-            let newSessions = cloudHistory.filter { !existingIDs.contains($0.id) }
-            if !newSessions.isEmpty {
-                var merged = (sessionHistory + newSessions).sorted { $0.date < $1.date }
-                if merged.count > 200 { merged = Array(merged.suffix(200)) }
-                sessionHistory = merged
-            }
-        }
+        notificationHour     = defaults.object(forKey: Keys.notificationHour)    as? Int ?? 9
+        notificationMinute   = defaults.object(forKey: Keys.notificationMinute)  as? Int ?? 0
     }
 }
 
