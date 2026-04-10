@@ -5,9 +5,11 @@ struct StudyView: View {
     @EnvironmentObject var appState: AppState
     @State private var showLevelPicker = false
     @State private var showSession    = false
+    @State private var sessionQueue: [Kanji] = []
 
     private let sessionSizeOptions = [5, 10, 15, 20]
 
+    // Used only for the banner count and button label — NOT passed to SessionView
     private var dueKanji: [Kanji] {
         SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: appState.sessionSize)
     }
@@ -73,6 +75,13 @@ struct StudyView: View {
 
                     // ── Start session button
                     Button {
+                        // Snapshot the queue at tap time so fullScreenCover
+                        // always receives the current sessionSize.
+                        sessionQueue = SRSEngine.dueCards(
+                            from: appState.cards,
+                            levels: appState.selectedLevels,
+                            limit: appState.sessionSize
+                        )
                         showSession = true
                     } label: {
                         HStack {
@@ -113,7 +122,7 @@ struct StudyView: View {
                     .environmentObject(appState)
             }
             .fullScreenCover(isPresented: $showSession) {
-                SessionView(queue: dueKanji)
+                SessionView(queue: sessionQueue)
                     .environmentObject(appState)
             }
         }
