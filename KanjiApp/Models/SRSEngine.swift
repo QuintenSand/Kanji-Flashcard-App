@@ -114,9 +114,9 @@ struct SRSEngine {
             if let card = cards[$0.id] { return card.isDueForReview } else { return false }
         }
 
-        // Mix: up to 5 new + rest from due
-        let newBatch = Array(newKanji.prefix(min(5, limit)))
-        let dueBatch = Array(dueKanji.prefix(limit - newBatch.count))
+        // Prioritise due cards first, then fill remaining slots with new cards
+        let dueBatch = Array(dueKanji.prefix(limit))
+        let newBatch = Array(newKanji.prefix(limit - dueBatch.count))
         return (dueBatch + newBatch).shuffled()
     }
 }
