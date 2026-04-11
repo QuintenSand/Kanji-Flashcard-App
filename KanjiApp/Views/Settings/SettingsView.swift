@@ -27,8 +27,8 @@ struct SettingsView: View {
                                 .foregroundStyle(.white)
                         }
                         Toggle("Daily Reminder", isOn: $appState.notificationsEnabled)
-                            .onChange(of: appState.notificationsEnabled) { enabled in
-                                handleToggle(enabled)
+                            .onChange(of: appState.notificationsEnabled) { newValue in
+                                handleToggle(newValue)
                             }
                     }
 

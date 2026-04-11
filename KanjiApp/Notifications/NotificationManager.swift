@@ -69,6 +69,8 @@ final class NotificationManager {
 
     /// Clears the app badge when the user opens the app.
     func clearBadge() {
-        UNUserNotificationCenter.current().setBadgeCount(0) { _ in }
+        Task {
+            try? await UNUserNotificationCenter.current().setBadgeCount(0)
+        }
     }
 }

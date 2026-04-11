@@ -9,9 +9,15 @@ struct StudyView: View {
 
     private let sessionSizeOptions = [5, 10, 15, 20]
 
-    // Used only for the banner count and button label — NOT passed to SessionView
+    // All available cards (due + new) for selected levels — not capped by session size.
+    // Used for the banner count and to derive the actual session count.
     private var dueKanji: [Kanji] {
-        SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: appState.sessionSize)
+        SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: 10_000)
+    }
+
+    // How many cards will actually appear in the next session.
+    private var sessionCardCount: Int {
+        min(dueKanji.count, appState.sessionSize)
     }
 
     var body: some View {
@@ -87,7 +93,7 @@ struct StudyView: View {
                         HStack {
                             Image(systemName: dueKanji.isEmpty ? "checkmark.circle.fill" : "play.fill")
                                 .font(.title3)
-                            Text(dueKanji.isEmpty ? "All caught up!" : "Start Review (\(dueKanji.count))")
+                            Text(dueKanji.isEmpty ? "All caught up!" : "Start Review (\(sessionCardCount))")
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)

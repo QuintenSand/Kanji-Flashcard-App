@@ -8,16 +8,19 @@ struct ContentView: View {
     var body: some View {
         TabView {
             LibraryView()
+                .environmentObject(appState)
                 .tabItem {
                     Label("Library", systemImage: "books.vertical.fill")
                 }
 
             StudyView()
+                .environmentObject(appState)
                 .tabItem {
                     Label("Study", systemImage: "graduationcap.fill")
                 }
 
             StatsView()
+                .environmentObject(appState)
                 .tabItem {
                     Label("Statistics", systemImage: "chart.bar.fill")
                 }
