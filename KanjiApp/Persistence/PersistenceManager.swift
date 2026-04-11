@@ -2,6 +2,7 @@ import Foundation
 import Combine
 
 // MARK: - App State (ObservableObject, persisted via UserDefaults)
+
 final class AppState: ObservableObject {
 
     // ── SRS cards: kanjiID → SRSCard
@@ -24,29 +25,57 @@ final class AppState: ObservableObject {
         didSet { save() }
     }
 
+    // ── Session size preference (cards per review)
+    @Published var sessionSize: Int = 10 {
+        didSet { defaults.set(sessionSize, forKey: Keys.sessionSize) }
+    }
+
+    // ── Notification preferences
+    @Published var notificationsEnabled: Bool = false {
+        didSet {
+            defaults.set(notificationsEnabled, forKey: Keys.notificationsEnabled)
+            rescheduleNotification()
+        }
+    }
+    @Published var notificationHour: Int = 9 {
+        didSet {
+            defaults.set(notificationHour, forKey: Keys.notificationHour)
+            rescheduleNotification()
+        }
+    }
+    @Published var notificationMinute: Int = 0 {
+        didSet {
+            defaults.set(notificationMinute, forKey: Keys.notificationMinute)
+            rescheduleNotification()
+        }
+    }
+
     // ─────────────────────────────────────────────────────
     private let defaults = UserDefaults.standard
+
     private enum Keys {
-        static let cards          = "srs_cards_v1"
-        static let studyDates     = "study_dates_v1"
-        static let sessionHistory = "session_history_v1"
-        static let selectedLevels = "selected_levels_v1"
+        static let cards                = "srs_cards_v1"
+        static let studyDates           = "study_dates_v1"
+        static let sessionHistory       = "session_history_v1"
+        static let selectedLevels       = "selected_levels_v1"
+        static let sessionSize          = "session_size_v1"
+        static let notificationsEnabled = "notifications_enabled_v1"
+        static let notificationHour     = "notification_hour_v1"
+        static let notificationMinute   = "notification_minute_v1"
     }
 
     init() { load() }
 
     // MARK: - Computed stats
+
     var currentStreak: Int {
         guard !studyDates.isEmpty else { return 0 }
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         var streak = 0
         var checkDate = today
-
         while true {
-            let studied = studyDates.contains {
-                calendar.isDate($0, inSameDayAs: checkDate)
-            }
+            let studied = studyDates.contains { calendar.isDate($0, inSameDayAs: checkDate) }
             guard studied else { break }
             streak += 1
             checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
@@ -57,9 +86,7 @@ final class AppState: ObservableObject {
     var longestStreak: Int {
         guard !studyDates.isEmpty else { return 0 }
         let calendar = Calendar.current
-        let sorted = studyDates
-            .map { calendar.startOfDay(for: $0) }
-            .sorted()
+        let sorted = studyDates.map { calendar.startOfDay(for: $0) }.sorted()
         var best = 1, current = 1
         for i in 1..<sorted.count {
             let diff = calendar.dateComponents([.day], from: sorted[i-1], to: sorted[i]).day ?? 0
@@ -76,18 +103,9 @@ final class AppState: ObservableObject {
         return Double(totalCorrect) / Double(totalReviewed)
     }
 
-    var masteredCount: Int {
-        // card with interval >= 21 days is "mastered"
-        cards.values.filter { $0.interval >= 21 }.count
-    }
-
-    var learnedCount: Int {
-        cards.values.filter { $0.repetitions > 0 }.count
-    }
-
-    var dueCount: Int {
-        cards.values.filter { $0.isDueForReview }.count
-    }
+    var masteredCount: Int { cards.values.filter { $0.interval >= 21 }.count }
+    var learnedCount:  Int { cards.values.filter { $0.repetitions > 0 }.count }
+    var dueCount:      Int { cards.values.filter { $0.isDueForReview }.count }
 
     func levelProgress(_ level: JLPTLevel) -> Double {
         let total = KanjiDatabase.all.filter { $0.level == level }.count
@@ -100,6 +118,7 @@ final class AppState: ObservableObject {
     }
 
     // MARK: - Study actions
+
     func recordReview(kanjiID: String, rating: ReviewRating) {
         let existing = cards[kanjiID] ?? SRSCard(kanjiID: kanjiID)
         cards[kanjiID] = SRSEngine.processReview(card: existing, rating: rating)
@@ -118,38 +137,44 @@ final class AppState: ObservableObject {
         }
     }
 
+    // MARK: - Notifications
+
+    func rescheduleNotification() {
+        if notificationsEnabled {
+            NotificationManager.shared.scheduleDailyReminder(
+                hour:     notificationHour,
+                minute:   notificationMinute,
+                dueCount: dueCount
+            )
+        } else {
+            NotificationManager.shared.cancelDailyReminder()
+        }
+    }
+
     // MARK: - Persistence
+
     private func save() {
-        if let data = try? JSONEncoder().encode(cards) {
-            defaults.set(data, forKey: Keys.cards)
-        }
-        if let data = try? JSONEncoder().encode(studyDates) {
-            defaults.set(data, forKey: Keys.studyDates)
-        }
-        if let data = try? JSONEncoder().encode(sessionHistory) {
-            defaults.set(data, forKey: Keys.sessionHistory)
-        }
-        let levelRaws = selectedLevels.map { $0.rawValue }
-        defaults.set(levelRaws, forKey: Keys.selectedLevels)
+        if let d = try? JSONEncoder().encode(cards)         { defaults.set(d, forKey: Keys.cards) }
+        if let d = try? JSONEncoder().encode(studyDates)    { defaults.set(d, forKey: Keys.studyDates) }
+        if let d = try? JSONEncoder().encode(sessionHistory){ defaults.set(d, forKey: Keys.sessionHistory) }
+        defaults.set(selectedLevels.map { $0.rawValue }, forKey: Keys.selectedLevels)
     }
 
     private func load() {
-        if let data = defaults.data(forKey: Keys.cards),
-           let decoded = try? JSONDecoder().decode([String: SRSCard].self, from: data) {
-            cards = decoded
-        }
-        if let data = defaults.data(forKey: Keys.studyDates),
-           let decoded = try? JSONDecoder().decode([Date].self, from: data) {
-            studyDates = decoded
-        }
-        if let data = defaults.data(forKey: Keys.sessionHistory),
-           let decoded = try? JSONDecoder().decode([StudySession].self, from: data) {
-            sessionHistory = decoded
-        }
+        if let d = defaults.data(forKey: Keys.cards),
+           let v = try? JSONDecoder().decode([String: SRSCard].self, from: d)   { cards = v }
+        if let d = defaults.data(forKey: Keys.studyDates),
+           let v = try? JSONDecoder().decode([Date].self, from: d)              { studyDates = v }
+        if let d = defaults.data(forKey: Keys.sessionHistory),
+           let v = try? JSONDecoder().decode([StudySession].self, from: d)      { sessionHistory = v }
         if let raws = defaults.stringArray(forKey: Keys.selectedLevels) {
             selectedLevels = Set(raws.compactMap { JLPTLevel(rawValue: $0) })
             if selectedLevels.isEmpty { selectedLevels = [.N5] }
         }
+        sessionSize          = defaults.object(forKey: Keys.sessionSize)         as? Int ?? 10
+        notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
+        notificationHour     = defaults.object(forKey: Keys.notificationHour)    as? Int ?? 9
+        notificationMinute   = defaults.object(forKey: Keys.notificationMinute)  as? Int ?? 0
     }
 }
 

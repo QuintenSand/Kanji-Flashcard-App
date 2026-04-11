@@ -5,9 +5,19 @@ struct StudyView: View {
     @EnvironmentObject var appState: AppState
     @State private var showLevelPicker = false
     @State private var showSession    = false
+    @State private var sessionQueue: [Kanji] = []
 
+    private let sessionSizeOptions = [5, 10, 15, 20]
+
+    // All available cards (due + new) for selected levels — not capped by session size.
+    // Used for the banner count and to derive the actual session count.
     private var dueKanji: [Kanji] {
-        SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: 30)
+        SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: 10_000)
+    }
+
+    // How many cards will actually appear in the next session.
+    private var sessionCardCount: Int {
+        min(dueKanji.count, appState.sessionSize)
     }
 
     var body: some View {
@@ -44,14 +54,46 @@ struct StudyView: View {
                         }
                     }
 
+                    // ── Session size picker
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Cards per session")
+                            .font(.headline)
+                            .padding(.horizontal)
+
+                        HStack(spacing: 10) {
+                            ForEach(sessionSizeOptions, id: \.self) { size in
+                                let isSelected = appState.sessionSize == size
+                                Button {
+                                    appState.sessionSize = size
+                                } label: {
+                                    Text("\(size)")
+                                        .font(.subheadline.weight(.semibold))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 10)
+                                        .background(isSelected ? Color.accentColor : Color(.systemGray5))
+                                        .foregroundStyle(isSelected ? .white : .primary)
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
                     // ── Start session button
                     Button {
+                        // Snapshot the queue at tap time so fullScreenCover
+                        // always receives the current sessionSize.
+                        sessionQueue = SRSEngine.dueCards(
+                            from: appState.cards,
+                            levels: appState.selectedLevels,
+                            limit: appState.sessionSize
+                        )
                         showSession = true
                     } label: {
                         HStack {
                             Image(systemName: dueKanji.isEmpty ? "checkmark.circle.fill" : "play.fill")
                                 .font(.title3)
-                            Text(dueKanji.isEmpty ? "All caught up!" : "Start Review (\(dueKanji.count))")
+                            Text(dueKanji.isEmpty ? "All caught up!" : "Start Review (\(sessionCardCount))")
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
@@ -86,7 +128,7 @@ struct StudyView: View {
                     .environmentObject(appState)
             }
             .fullScreenCover(isPresented: $showSession) {
-                SessionView(queue: dueKanji)
+                SessionView(queue: sessionQueue)
                     .environmentObject(appState)
             }
         }
