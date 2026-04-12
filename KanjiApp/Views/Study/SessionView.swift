@@ -5,9 +5,12 @@ struct SessionView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
 
-    let queue: [Kanji]
+    // Mutable active queue — "Again" cards get appended for re-review
+    @State private var activeQueue: [Kanji]
+    // Original count kept for the progress bar denominator so it never shrinks
+    private let originalCount: Int
 
-    @State private var currentIndex = 0
+    @State private var currentIndex  = 0
     @State private var isFlipped     = false
     @State private var dragOffset    = CGSize.zero
     @State private var sessionStart  = Date()
@@ -16,24 +19,45 @@ struct SessionView: View {
     @State private var showSummary   = false
     @State private var cardOpacity   = 1.0
     @State private var cardRotation  = 0.0
+    @State private var sessionSaved  = false   // guard against double-recording
+
+    init(queue: [Kanji]) {
+        self._activeQueue  = State(initialValue: queue)
+        self.originalCount = queue.count
+    }
 
     private var currentKanji: Kanji? {
-        guard currentIndex < queue.count else { return nil }
-        return queue[currentIndex]
+        guard currentIndex < activeQueue.count else { return nil }
+        return activeQueue[currentIndex]
+    }
+
+    // Cards available for another practice round (computed lazily when summary appears)
+    private var nextPracticeQueue: [Kanji] {
+        SRSEngine.practiceCards(
+            from: appState.cards,
+            levels: appState.selectedLevels,
+            limit: appState.sessionSize
+        )
     }
 
     var body: some View {
         ZStack {
             Color(.systemGroupedBackground).ignoresSafeArea()
 
-            if showSummary || currentIndex >= queue.count {
+            if showSummary || currentIndex >= activeQueue.count {
                 SessionSummaryView(
                     reviewed: reviewed,
                     correct: correct,
-                    duration: Int(Date().timeIntervalSince(sessionStart))
-                ) {
-                    dismiss()
-                }
+                    duration: Int(Date().timeIntervalSince(sessionStart)),
+                    onDone: {
+                        saveSessionIfNeeded()
+                        dismiss()
+                    },
+                    onPracticeMore: nextPracticeQueue.isEmpty ? nil : {
+                        startNewPracticeRound()
+                    }
+                )
+                .onAppear { saveSessionIfNeeded() }
             } else {
                 VStack(spacing: 0) {
                     // ── Header
@@ -47,7 +71,8 @@ struct SessionView: View {
                                 .clipShape(Circle())
                         }
                         Spacer()
-                        Text("\(currentIndex + 1) / \(queue.count)")
+                        // Show "reviewed / original" — doesn't shrink when cards are re-queued
+                        Text("\(min(currentIndex + 1, activeQueue.count)) / \(max(originalCount, activeQueue.count))")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                         Spacer()
@@ -66,12 +91,15 @@ struct SessionView: View {
                     .padding(.horizontal)
                     .padding(.top, 16)
 
-                    // ── Progress bar
+                    // ── Progress bar (based on original count so it never goes backward)
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             Capsule().fill(Color(.systemGray5)).frame(height: 4)
                             Capsule().fill(Color.accentColor)
-                                .frame(width: geo.size.width * CGFloat(currentIndex) / CGFloat(max(1, queue.count)), height: 4)
+                                .frame(
+                                    width: geo.size.width * CGFloat(currentIndex) / CGFloat(max(1, activeQueue.count)),
+                                    height: 4
+                                )
                                 .animation(.easeInOut, value: currentIndex)
                         }
                     }
@@ -120,6 +148,7 @@ struct SessionView: View {
     }
 
     // MARK: - Actions
+
     private func flipCard() {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
             cardRotation = isFlipped ? 0 : 180
@@ -135,11 +164,16 @@ struct SessionView: View {
         reviewed += 1
         if rating == .good || rating == .easy { correct += 1 }
 
+        // Re-queue "Again" cards so the user sees them again this session
+        if rating == .again {
+            activeQueue.append(kanji)
+        }
+
         animateCardOut {
             currentIndex += 1
-            isFlipped     = false
-            dragOffset    = .zero
-            cardRotation  = 0
+            isFlipped    = false
+            dragOffset   = .zero
+            cardRotation = 0
         }
     }
 
@@ -160,7 +194,13 @@ struct SessionView: View {
     }
 
     private func confirmQuit() {
-        // Save session
+        saveSessionIfNeeded()
+        showSummary = true
+    }
+
+    private func saveSessionIfNeeded() {
+        guard !sessionSaved else { return }
+        sessionSaved = true
         let session = StudySession(
             date: sessionStart,
             reviewed: reviewed,
@@ -169,7 +209,23 @@ struct SessionView: View {
             levels: Array(appState.selectedLevels.map { $0.rawValue })
         )
         appState.recordSession(session)
-        showSummary = true
+    }
+
+    /// Reset all session state and start another practice round without dismissing.
+    private func startNewPracticeRound() {
+        let newQueue = nextPracticeQueue
+        guard !newQueue.isEmpty else { return }
+        activeQueue  = newQueue
+        currentIndex = 0
+        reviewed     = 0
+        correct      = 0
+        isFlipped    = false
+        dragOffset   = .zero
+        cardRotation = 0
+        cardOpacity  = 1
+        showSummary  = false
+        sessionSaved = false
+        sessionStart = Date()
     }
 }
 
@@ -279,6 +335,7 @@ struct SessionSummaryView: View {
     let correct: Int
     let duration: Int
     let onDone: () -> Void
+    var onPracticeMore: (() -> Void)? = nil   // nil = button hidden
 
     private var accuracy: Double {
         guard reviewed > 0 else { return 0 }
@@ -317,17 +374,37 @@ struct SessionSummaryView: View {
 
             Spacer()
 
-            Button(action: onDone) {
-                Text("Back to Study")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            VStack(spacing: 12) {
+                // Keep Practicing — only shown when there are more cards to review
+                if let practiceMore = onPracticeMore {
+                    Button(action: practiceMore) {
+                        HStack {
+                            Image(systemName: "arrow.clockwise.circle.fill")
+                                .font(.title3)
+                            Text("Keep Practicing")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                    }
+                    .padding(.horizontal)
+                }
+
+                Button(action: onDone) {
+                    Text("Back to Study")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(onPracticeMore == nil ? Color.accentColor : Color(.systemGray5))
+                        .foregroundStyle(onPracticeMore == nil ? Color.white : Color.primary)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 40)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 40)
         }
     }
 }
