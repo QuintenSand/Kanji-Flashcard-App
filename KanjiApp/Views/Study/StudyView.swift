@@ -83,6 +83,7 @@ struct StudyView: View {
                                         .foregroundStyle(isSelected ? .white : .primary)
                                         .clipShape(RoundedRectangle(cornerRadius: 12))
                                 }
+                                .accessibilityLabel("\(size) cards per session\(isSelected ? ", selected" : "")")
                             }
                         }
                         .padding(.horizontal)
@@ -201,6 +202,7 @@ private struct DueTodayBanner: View {
                     .font(.title2.weight(.bold))
                     .foregroundStyle(dueCount == 0 ? Color.green : Color.accentColor)
             }
+            .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(dueCount == 0 ? "All done for today! 🎉" : "Cards due today")
                     .font(.headline)
@@ -215,6 +217,10 @@ private struct DueTodayBanner: View {
         .padding()
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(dueCount == 0
+            ? "All done for today. \(practiceCount > 0 ? "\(practiceCount) cards available for extra practice" : "Come back tomorrow for more reviews")"
+            : "\(dueCount) cards due today. Keep your streak going!")
     }
 }
 
@@ -272,6 +278,8 @@ private struct LevelProgressCard: View {
             RoundedRectangle(cornerRadius: 14)
                 .stroke(isSelected ? color : .clear, lineWidth: 2)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(level.rawValue), \(level.kanjiCount) kanji, \(String(format: "%.0f", progress * 100)) percent progress\(isSelected ? ", selected" : "")")
     }
 }
 
@@ -290,6 +298,8 @@ private struct StudyStatTile: View {
             Text(label).font(.caption2).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
 

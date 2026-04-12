@@ -4,6 +4,7 @@ import SwiftUI
 struct SessionView: View {
     @EnvironmentObject var appState: AppState
     @Environment(\.dismiss) var dismiss
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     // Mutable active queue — "Again" cards get appended for re-review
     @State private var activeQueue: [Kanji]
@@ -70,11 +71,14 @@ struct SessionView: View {
                                 .background(Color(.systemGray5))
                                 .clipShape(Circle())
                         }
+                        .accessibilityLabel("End session")
+                        .accessibilityHint("Ends the current study session and shows your results")
                         Spacer()
                         // Show "reviewed / original" — doesn't shrink when cards are re-queued
                         Text("\(min(currentIndex + 1, activeQueue.count)) / \(max(originalCount, activeQueue.count))")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                            .accessibilityLabel("Card \(min(currentIndex + 1, activeQueue.count)) of \(max(originalCount, activeQueue.count))")
                         Spacer()
                         // accuracy badge
                         if reviewed > 0 {
@@ -84,6 +88,7 @@ struct SessionView: View {
                                 .padding(8)
                                 .background(Color.green.opacity(0.1))
                                 .clipShape(Capsule())
+                                .accessibilityLabel("Accuracy \(String(format: "%.0f", Double(correct)/Double(reviewed)*100)) percent")
                         } else {
                             Color.clear.frame(width: 44, height: 44)
                         }
@@ -100,12 +105,15 @@ struct SessionView: View {
                                     width: geo.size.width * CGFloat(currentIndex) / CGFloat(max(1, activeQueue.count)),
                                     height: 4
                                 )
-                                .animation(.easeInOut, value: currentIndex)
+                                .animation(reduceMotion ? .none : .easeInOut, value: currentIndex)
                         }
                     }
                     .frame(height: 4)
                     .padding(.horizontal)
                     .padding(.top, 12)
+                    .accessibilityElement()
+                    .accessibilityLabel("Session progress")
+                    .accessibilityValue("\(currentIndex) of \(max(originalCount, activeQueue.count)) cards completed")
 
                     Spacer()
 
@@ -122,6 +130,12 @@ struct SessionView: View {
                             )
                             .onTapGesture { flipCard() }
                             .padding(.horizontal, 20)
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel(isFlipped
+                                ? "\(kanji.id), \(kanji.meanings.joined(separator: ", ")). On'yomi: \(kanji.onyomiDisplay). Kun'yomi: \(kanji.kunyomiDisplay)"
+                                : "Kanji \(kanji.id), \(kanji.level.displayName)")
+                            .accessibilityHint(isFlipped ? "Swipe right for easy, left for again, or use the rating buttons below" : "Double-tap to reveal the answer")
+                            .accessibilityAddTraits(.isButton)
                     }
 
                     Spacer()
@@ -150,11 +164,16 @@ struct SessionView: View {
     // MARK: - Actions
 
     private func flipCard() {
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+        if reduceMotion {
             cardRotation = isFlipped ? 0 : 180
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
             isFlipped.toggle()
+        } else {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                cardRotation = isFlipped ? 0 : 180
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                isFlipped.toggle()
+            }
         }
     }
 
@@ -186,10 +205,14 @@ struct SessionView: View {
     }
 
     private func animateCardOut(completion: @escaping () -> Void) {
-        withAnimation(.easeOut(duration: 0.2)) { cardOpacity = 0 }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        if reduceMotion {
             completion()
-            withAnimation(.easeIn(duration: 0.2)) { cardOpacity = 1 }
+        } else {
+            withAnimation(.easeOut(duration: 0.2)) { cardOpacity = 0 }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                completion()
+                withAnimation(.easeIn(duration: 0.2)) { cardOpacity = 1 }
+            }
         }
     }
 
@@ -315,7 +338,18 @@ struct RatingButtonRow: View {
                             .stroke(ratingColor(rating).opacity(0.3), lineWidth: 1)
                     )
                 }
+                .accessibilityLabel("Rate \(rating.label)")
+                .accessibilityHint(ratingHint(rating))
             }
+        }
+    }
+
+    private func ratingHint(_ r: ReviewRating) -> String {
+        switch r {
+        case .again: return "You didn't remember this kanji. It will appear again soon."
+        case .hard:  return "You found this kanji difficult. The interval will be short."
+        case .good:  return "You remembered this kanji correctly."
+        case .easy:  return "This kanji was easy. The interval will increase more."
         }
     }
 
@@ -423,5 +457,7 @@ private struct SummaryTile: View {
         .padding(.vertical, 16)
         .background(color.opacity(0.08))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }

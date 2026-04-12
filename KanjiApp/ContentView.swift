@@ -44,6 +44,7 @@ struct ContentView: View {
             .padding(.top, 56)
             .padding(.trailing, 16)
             .accessibilityLabel("Settings")
+            .accessibilityHint("Opens app settings including notifications, session size, and data management")
         }
         .sheet(isPresented: $showSettings) {
             SettingsView()

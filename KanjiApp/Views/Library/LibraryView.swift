@@ -104,6 +104,8 @@ private struct LevelChip: View {
                 .foregroundStyle(isSelected ? .white : .primary)
                 .clipShape(Capsule())
         }
+        .accessibilityLabel("Filter \(label)\(isSelected ? ", active" : "")")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -117,6 +119,13 @@ struct KanjiGridCell: View {
         if card.interval >= 21 { return .green }
         if card.repetitions > 0 { return .blue }
         return Color(.systemGray5)
+    }
+
+    private var statusLabel: String {
+        guard let card else { return "not started" }
+        if card.interval >= 21 { return "mastered" }
+        if card.repetitions > 0 { return "in progress" }
+        return "not started"
     }
 
     var body: some View {
@@ -136,6 +145,9 @@ struct KanjiGridCell: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 14))
         .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(kanji.id), \(kanji.primaryMeaning), \(kanji.level.displayName), \(statusLabel)")
+        .accessibilityHint("Double-tap to view details")
     }
 }
 
@@ -225,6 +237,8 @@ private struct ReadingCard: View {
         .padding()
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 14))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title): \(reading)")
     }
 }
 
@@ -250,6 +264,8 @@ private struct ExampleRow: View {
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .padding(.horizontal)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(example.word), read as \(example.reading), meaning \(example.meaning)")
     }
 }
 
@@ -310,6 +326,8 @@ struct StatPill: View {
         .padding(.vertical, 8)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
 
@@ -335,5 +353,6 @@ struct LevelBadge: View {
             .foregroundStyle(color)
             .clipShape(Capsule())
             .overlay(Capsule().stroke(color.opacity(0.3), lineWidth: 1))
+            .accessibilityLabel("JLPT \(level.rawValue)")
     }
 }
