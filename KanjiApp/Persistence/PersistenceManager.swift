@@ -137,6 +137,19 @@ final class AppState: ObservableObject {
         }
     }
 
+    // MARK: - Reset
+
+    /// Wipes all SRS progress, study dates, and session history.
+    /// User preferences (levels, session size, notifications) are kept.
+    func resetProgress() {
+        cards          = [:]
+        studyDates     = []
+        sessionHistory = []
+        defaults.removeObject(forKey: Keys.cards)
+        defaults.removeObject(forKey: Keys.studyDates)
+        defaults.removeObject(forKey: Keys.sessionHistory)
+    }
+
     // MARK: - Notifications
 
     func rescheduleNotification() {
