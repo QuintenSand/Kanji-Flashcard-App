@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanji Flashcard App — App Store Screenshots</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a2e;
+    font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+    gap: 60px;
+  }
+
+  h1.page-title {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-align: center;
+    opacity: 0.85;
+  }
+
+  .screenshots-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* iPhone frame */
+  .iphone {
+    width: 320px;
+    height: 692px;
+    background: #1c1c1e;
+    border-radius: 52px;
+    padding: 14px;
+    box-shadow:
+      0 0 0 1.5px #3a3a3c,
+      0 40px 80px rgba(0,0,0,0.6),
+      inset 0 0 0 2px #2c2c2e;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .iphone-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    background: #f2f2f7;
+  }
+
+  /* Dynamic island */
+  .dynamic-island {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 30px;
+    background: #1c1c1e;
+    border-radius: 20px;
+    z-index: 100;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 8px;
+    position: relative;
+    z-index: 50;
+  }
+
+  .status-time {
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+  }
+  .status-icons {
+    font-size: 12px;
+    color: #000;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  /* ── Marketing label below each phone ── */
+  .caption {
+    margin-top: 20px;
+    text-align: center;
+  }
+  .caption h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .caption p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+
+  /* ══════════════════════════════════
+     SCREEN 1 — Welcome / Onboarding
+  ══════════════════════════════════ */
+  .s1-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(0,122,255,0.12) 0%, #f2f2f7 55%);
+  }
+  .s1-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;
+  }
+  .s1-circle {
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(0,122,255,0.10);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .s1-kanji {
+    font-size: 100px;
+    font-weight: 100;
+    color: #007AFF;
+    line-height: 1;
+  }
+  .s1-texts {
+    margin-top: 32px;
+    text-align: center;
+    padding: 0 24px;
+  }
+  .s1-jp {
+    font-size: 14px;
+    color: #8e8e93;
+    margin-bottom: 8px;
+  }
+  .s1-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: #000;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+  .s1-sub {
+    margin-top: 12px;
+    font-size: 14px;
+    color: #636366;
+    line-height: 1.5;
+  }
+  .s1-dots {
+    display: flex; gap: 6px; justify-content: center;
+    margin-top: 28px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 4px; background: #c7c7cc; }
+  .dot.active { width: 20px; background: #007AFF; }
+  .s1-btn {
+    margin: 16px 24px 0;
+    background: #007AFF;
+    color: #fff;
+    border-radius: 14px;
+    padding: 14px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .s1-skip {
+    text-align: center;
+    color: #8e8e93;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  /* ══════════════════════════════════
+     SCREEN 2 — Flashcard Session
+  ══════════════════════════════════ */
+  .s2 { background: #f2f2f7; }
+  .s2-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 20px 12px;
+  }
+  .s2-close { font-size: 22px; color: #8e8e93; }
+  .s2-prog-wrap { flex: 1; margin: 0 14px; }
+  .s2-prog-label { font-size: 12px; color: #8e8e93; text-align: right; margin-bottom: 4px; }
+  .s2-prog-bar { height: 5px; background: #e5e5ea; border-radius: 3px; overflow: hidden; }
+  .s2-prog-fill { height: 100%; width: 45%; background: #007AFF; border-radius: 3px; }
+  .s2-card {
+    margin: 0 20px;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+    padding: 28px 20px 22px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .s2-badge {
+    background: rgba(52,199,89,0.15);
+    color: #34c759;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+  .s2-kanji { font-size: 88px; font-weight: 100; line-height: 1; color: #000; }
+  .s2-meaning { font-size: 24px; font-weight: 700; color: #000; margin-top: 8px; }
+  .s2-divider { width: 60%; height: 1px; background: #e5e5ea; margin: 12px 0; }
+  .s2-readings { display: flex; gap: 28px; justify-content: center; }
+  .s2-reading-col { text-align: center; }
+  .s2-reading-label { font-size: 11px; font-weight: 600; margin-bottom: 3px; }
+  .s2-reading-val { font-size: 15px; font-weight: 500; color: #000; }
+  .s2-rating-row {
+    display: flex; gap: 8px;
+    margin: 16px 20px 0;
+  }
+  .s2-rate-btn {
+    flex: 1;
+    border-radius: 12px;
+    padding: 10px 4px;
+    text-align: center;
+    border: 1px solid transparent;
+  }
+  .s2-rate-emoji { font-size: 18px; }
+  .s2-rate-label { font-size: 11px; font-weight: 600; margin-top: 3px; }
+  .btn-again   { background: rgba(255,59,48,0.09); color: #ff3b30; border-color: rgba(255,59,48,0.25); }
+  .btn-hard    { background: rgba(255,149,0,0.09); color: #ff9500; border-color: rgba(255,149,0,0.25); }
+  .btn-good    { background: rgba(52,199,89,0.09); color: #34c759; border-color: rgba(52,199,89,0.25); }
+  .btn-easy    { background: rgba(0,122,255,0.09); color: #007AFF; border-color: rgba(0,122,255,0.25); }
+  .s2-stats-row {
+    display: flex; gap: 8px; margin: 12px 20px 0;
+  }
+  .s2-stat-box {
+    flex: 1; background: #fff; border-radius: 12px;
+    padding: 10px 0; text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .s2-stat-val { font-size: 18px; font-weight: 700; }
+  .s2-stat-key { font-size: 10px; color: #8e8e93; margin-top: 2px; }
+
+  /* ══════════════════════════════════
+     SCREEN 3 — Library
+  ══════════════════════════════════ */
+  .s3 { background: #f2f2f7; }
+  .s3-header {
+    padding: 0 20px 12px;
+    font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+    color: #000;
+  }
+  .s3-search {
+    margin: 0 20px 14px;
+    background: rgba(118,118,128,0.12);
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: #8e8e93;
+  }
+  .s3-level-pill-row {
+    display: flex; gap: 8px; padding: 0 20px 16px; overflow-x: auto;
+  }
+  .s3-pill {
+    flex-shrink: 0;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    border: 1.5px solid transparent;
+  }
+  .pill-all   { background: #007AFF; color: #fff; }
+  .pill-n5    { background: rgba(52,199,89,0.12); color: #34c759; border-color: rgba(52,199,89,0.3); }
+  .pill-n4    { background: rgba(0,122,255,0.10); color: #007AFF; border-color: rgba(0,122,255,0.3); }
+  .pill-n3    { background: rgba(255,149,0,0.10); color: #ff9500; border-color: rgba(255,149,0,0.3); }
+  .pill-n2    { background: rgba(175,82,222,0.10); color: #af52de; border-color: rgba(175,82,222,0.3); }
+  .pill-n1    { background: rgba(255,59,48,0.10); color: #ff3b30; border-color: rgba(255,59,48,0.3); }
+
+  .s3-section-header {
+    font-size: 13px; font-weight: 600; color: #8e8e93;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    padding: 0 20px 8px;
+  }
+  .s3-kanji-grid {
+    display: grid; grid-template-columns: repeat(5,1fr);
+    gap: 8px; padding: 0 20px;
+  }
+  .s3-kanji-cell {
+    background: #fff;
+    border-radius: 12px;
+    aspect-ratio: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    position: relative;
+  }
+  .s3-kanji-char { font-size: 24px; font-weight: 300; color: #000; }
+  .s3-kanji-mean { font-size: 7px; color: #8e8e93; margin-top: 2px; text-align: center; line-height: 1.1; }
+  .s3-progress-dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 7px; height: 7px; border-radius: 50%;
+  }
+  .s3-level-card {
+    margin: 14px 20px 0;
+    background: #fff; border-radius: 16px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .s3-lc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .s3-lc-badge { font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 8px; }
+  .s3-lc-count { font-size: 12px; color: #8e8e93; }
+  .s3-lc-bar { height: 6px; background: #f2f2f7; border-radius: 3px; overflow: hidden; }
+  .s3-lc-fill { height: 100%; border-radius: 3px; }
+
+  /* ══════════════════════════════════
+     SCREEN 4 — Statistics
+  ══════════════════════════════════ */
+  .s4 { background: #f2f2f7; }
+  .s4-header { padding: 0 20px 16px; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #000; }
+  .s4-hero-row { display: flex; gap: 10px; padding: 0 20px; }
+  .s4-hero-box {
+    flex: 1; background: #007AFF; border-radius: 18px;
+    padding: 16px; color: #fff;
+  }
+  .s4-hero-val { font-size: 36px; font-weight: 800; line-height: 1; }
+  .s4-hero-label { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+  .s4-hero-icon { font-size: 20px; margin-bottom: 4px; }
+
+  .s4-streak-box {
+    flex: 1; background: #ff9500; border-radius: 18px;
+    padding: 16px; color: #fff;
+  }
+  .s4-mini-row { display: flex; gap: 10px; margin: 10px 20px 0; }
+  .s4-mini-box {
+    flex: 1; background: #fff; border-radius: 14px;
+    padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+  .s4-mini-val { font-size: 22px; font-weight: 700; color: #000; }
+  .s4-mini-label { font-size: 11px; color: #8e8e93; margin-top: 2px; }
+
+  .s4-chart-box {
+    margin: 10px 20px 0; background: #fff; border-radius: 16px;
+    padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .s4-chart-title { font-size: 13px; font-weight: 600; color: #000; margin-bottom: 12px; }
+  .s4-bars { display: flex; align-items: flex-end; gap: 6px; height: 70px; }
+  .s4-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .s4-bar { width: 100%; border-radius: 4px 4px 0 0; background: rgba(0,122,255,0.15); }
+  .s4-bar.active { background: #007AFF; }
+  .s4-bar-label { font-size: 9px; color: #8e8e93; }
+
+  .s4-acc-row {
+    margin: 10px 20px 0; background: #fff; border-radius: 14px;
+    padding: 14px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .s4-acc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .s4-acc-label { font-size: 13px; font-weight: 600; color: #000; }
+  .s4-acc-pct { font-size: 20px; font-weight: 700; color: #34c759; }
+  .s4-acc-bar { height: 8px; background: #f2f2f7; border-radius: 4px; overflow: hidden; }
+  .s4-acc-fill { height: 100%; width: 78%; background: linear-gradient(90deg, #34c759, #30d158); border-radius: 4px; }
+
+  /* ══════════════════════════════════
+     SCREEN 5 — Summary / Keep Practicing
+  ══════════════════════════════════ */
+  .s5 { background: #f2f2f7; }
+  .s5-confetti {
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(0,122,255,0.08) 0%, rgba(52,199,89,0.06) 100%);
+  }
+  .s5-trophy { font-size: 64px; text-align: center; margin-top: 24px; }
+  .s5-title { text-align: center; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #000; padding: 0 20px; line-height: 1.2; margin-top: 8px; }
+  .s5-sub { text-align: center; font-size: 14px; color: #636366; margin-top: 8px; padding: 0 28px; }
+  .s5-stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin: 20px 20px 0;
+  }
+  .s5-stat-card {
+    background: #fff; border-radius: 16px;
+    padding: 14px; text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .s5-stat-val { font-size: 28px; font-weight: 800; }
+  .s5-stat-label { font-size: 12px; color: #8e8e93; margin-top: 4px; }
+  .s5-next-btn {
+    margin: 16px 20px 0;
+    background: #007AFF; color: #fff;
+    border-radius: 14px; padding: 14px;
+    text-align: center; font-size: 15px; font-weight: 600;
+  }
+  .s5-practice-btn {
+    margin: 10px 20px 0;
+    background: rgba(52,199,89,0.12);
+    color: #34c759;
+    border: 1.5px solid rgba(52,199,89,0.3);
+    border-radius: 14px; padding: 13px;
+    text-align: center; font-size: 15px; font-weight: 600;
+  }
+  .s5-streak-banner {
+    margin: 12px 20px 0;
+    background: linear-gradient(135deg, #ff9500, #ff6b00);
+    border-radius: 14px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .s5-streak-icon { font-size: 28px; }
+  .s5-streak-text { color: #fff; }
+  .s5-streak-title { font-size: 14px; font-weight: 700; }
+  .s5-streak-sub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
+  /* ══ Print/export helpers ══ */
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .iphone { box-shadow: 0 0 0 2px #ddd; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">漢字フラッシュカード — App Store Screenshots</h1>
+
+<div class="screenshots-row">
+
+  <!-- ══ Screenshot 1: Welcome ══ -->
+  <div class="phone-wrap">
+    <div class="iphone">
+      <div class="iphone-screen">
+        <div class="dynamic-island"></div>
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#000"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#000"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#000"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#000" opacity="0.3"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="#000"><path d="M8 2.4C10.2 2.4 12.2 3.3 13.6 4.8L15 3.3C13.2 1.3 10.7 0 8 0S2.8 1.3 1 3.3L2.4 4.8C3.8 3.3 5.8 2.4 8 2.4Z"/><path d="M8 5.6C9.6 5.6 11 6.3 12 7.4L13.4 5.9C12 4.5 10.1 3.6 8 3.6S4 4.5 2.6 5.9L4 7.4C5 6.3 6.4 5.6 8 5.6Z"/><circle cx="8" cy="10" r="2"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#000" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#000"/><path d="M23 4.5V7.5a1.5 1.5 0 000-3z" fill="#000" opacity="0.4"/></svg>
+          </div>
+        </div>
+
+        <div class="s1-bg"></div>
+        <div class="s1-hero">
+          <div class="s1-circle">
+            <span class="s1-kanji">漢</span>
+          </div>
+          <div class="s1-texts">
+            <div class="s1-jp">漢字フラッシュカード</div>
+            <div class="s1-title">Kanji<br>Flashcard App</div>
+            <div class="s1-sub">Master all 1,318 JLPT kanji<br>with science-backed spaced repetition.</div>
+          </div>
+          <div style="margin-top: auto; width: 100%; position: absolute; bottom: 120px; left: 0; right: 0;">
+            <div class="s1-dots">
+              <div class="dot active"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+            <div class="s1-btn">Next</div>
+            <div class="s1-skip">Skip</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      <h2>Master 1,318 JLPT Kanji</h2>
+      <p>All levels, N5 through N1</p>
+    </div>
+  </div>
+
+  <!-- ══ Screenshot 2: Flashcard Session ══ -->
+  <div class="phone-wrap">
+    <div class="iphone">
+      <div class="iphone-screen s2">
+        <div class="dynamic-island"></div>
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#000"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#000"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#000"/><rect x="13.5" y="0" width="2.5" height="12" rx="1" fill="#000" opacity="0.3"/></svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#000" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#000"/><path d="M23 4.5V7.5a1.5 1.5 0 000-3z" fill="#000" opacity="0.4"/></svg>
+          </div>
+        </div>
+
+        <div class="s2-nav">
+          <span class="s2-close">✕</span>
+          <div class="s2-prog-wrap">
+            <div class="s2-prog-label">5 / 10</div>
+            <div class="s2-prog-bar"><div class="s2-prog-fill"></div></div>
+          </div>
+        </div>
+
+        <div class="s2-card">
+          <div class="s2-badge">N3</div>
+          <div class="s2-kanji">海</div>
+          <div class="s2-meaning">sea, ocean</div>
+          <div class="s2-divider"></div>
+          <div class="s2-readings">
+            <div class="s2-reading-col">
+              <div class="s2-reading-label" style="color:#ff3b30;">On'yomi</div>
+              <div class="s2-reading-val">カイ</div>
+            </div>
+            <div class="s2-reading-col">
+              <div class="s2-reading-label" style="color:#007AFF;">Kun'yomi</div>
+              <div class="s2-reading-val">うみ</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="s2-rating-row">
+          <div class="s2-rate-btn btn-again"><div class="s2-rate-emoji">🔴</div><div class="s2-rate-label">Again</div></div>
+          <div class="s2-rate-btn btn-hard"><div class="s2-rate-emoji">🟠</div><div class="s2-rate-label">Hard</div></div>
+          <div class="s2-rate-btn btn-good"><div class="s2-rate-emoji">🟢</div><div class="s2-rate-label">Good</div></div>
+          <div class="s2-rate-btn btn-easy"><div class="s2-rate-emoji">⭐️</div><div class="s2-rate-label">Easy</div></div>
+        </div>
+
+        <div class="s2-stats-row">
+          <div class="s2-stat-box">
+            <div class="s2-stat-val" style="color:#34c759;">92%</div>
+            <div class="s2-stat-key">Accuracy</div>
+          </div>
+          <div class="s2-stat-box">
+            <div class="s2-stat-val" style="color:#007AFF;">🔥 7</div>
+            <div class="s2-stat-key">Day streak</div>
+          </div>
+          <div class="s2-stat-box">
+            <div class="s2-stat-val" style="color:#ff9500;">143</div>
+            <div class="s2-stat-key">Mastered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      <h2>Smart Spaced Repetition</h2>
+      <p>SM-2 algorithm, four difficulty ratings</p>
+    </div>
+  </div>
+
+  <!-- ══ Screenshot 3: Library ══ -->
+  <div class="phone-wrap">
+    <div class="iphone">
+      <div class="iphone-screen s3">
+        <div class="dynamic-island"></div>
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#000" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#000"/><path d="M23 4.5V7.5a1.5 1.5 0 000-3z" fill="#000" opacity="0.4"/></svg>
+          </div>
+        </div>
+
+        <div class="s3-header">Library</div>
+        <div class="s3-search">🔍  Search kanji…</div>
+        <div class="s3-level-pill-row">
+          <div class="s3-pill pill-all">All</div>
+          <div class="s3-pill pill-n5">N5</div>
+          <div class="s3-pill pill-n4">N4</div>
+          <div class="s3-pill pill-n3">N3</div>
+          <div class="s3-pill pill-n2">N2</div>
+          <div class="s3-pill pill-n1">N1</div>
+        </div>
+
+        <div class="s3-section-header">N5 · Beginner</div>
+        <div class="s3-kanji-grid">
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">日</span><span class="s3-kanji-mean">sun/day</span><div class="s3-progress-dot" style="background:#34c759;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">月</span><span class="s3-kanji-mean">moon</span><div class="s3-progress-dot" style="background:#34c759;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">山</span><span class="s3-kanji-mean">mountain</span><div class="s3-progress-dot" style="background:#34c759;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">川</span><span class="s3-kanji-mean">river</span><div class="s3-progress-dot" style="background:#34c759;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">火</span><span class="s3-kanji-mean">fire</span><div class="s3-progress-dot" style="background:#34c759;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">水</span><span class="s3-kanji-mean">water</span><div class="s3-progress-dot" style="background:#007AFF;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">木</span><span class="s3-kanji-mean">tree</span><div class="s3-progress-dot" style="background:#007AFF;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">土</span><span class="s3-kanji-mean">earth</span><div class="s3-progress-dot" style="background:#e5e5ea;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">金</span><span class="s3-kanji-mean">gold</span><div class="s3-progress-dot" style="background:#e5e5ea;"></div></div>
+          <div class="s3-kanji-cell"><span class="s3-kanji-char">人</span><span class="s3-kanji-mean">person</span><div class="s3-progress-dot" style="background:#e5e5ea;"></div></div>
+        </div>
+
+        <div class="s3-level-card" style="margin-top:12px;">
+          <div class="s3-lc-top">
+            <div class="s3-lc-badge" style="background:rgba(52,199,89,0.12);color:#34c759;">N5</div>
+            <div class="s3-lc-count">72 / 85 learned</div>
+          </div>
+          <div class="s3-lc-bar"><div class="s3-lc-fill" style="width:85%;background:#34c759;"></div></div>
+        </div>
+        <div class="s3-level-card" style="margin-top:8px;">
+          <div class="s3-lc-top">
+            <div class="s3-lc-badge" style="background:rgba(0,122,255,0.10);color:#007AFF;">N4</div>
+            <div class="s3-lc-count">94 / 170 learned</div>
+          </div>
+          <div class="s3-lc-bar"><div class="s3-lc-fill" style="width:55%;background:#007AFF;"></div></div>
+        </div>
+        <div class="s3-level-card" style="margin-top:8px;">
+          <div class="s3-lc-top">
+            <div class="s3-lc-badge" style="background:rgba(255,149,0,0.10);color:#ff9500;">N3</div>
+            <div class="s3-lc-count">48 / 375 learned</div>
+          </div>
+          <div class="s3-lc-bar"><div class="s3-lc-fill" style="width:13%;background:#ff9500;"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      <h2>Browse All 1,318 Kanji</h2>
+      <p>Filter by JLPT level, track your progress</p>
+    </div>
+  </div>
+
+  <!-- ══ Screenshot 4: Statistics ══ -->
+  <div class="phone-wrap">
+    <div class="iphone">
+      <div class="iphone-screen s4">
+        <div class="dynamic-island"></div>
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#000" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#000"/><path d="M23 4.5V7.5a1.5 1.5 0 000-3z" fill="#000" opacity="0.4"/></svg>
+          </div>
+        </div>
+
+        <div class="s4-header">Statistics</div>
+
+        <div class="s4-hero-row">
+          <div class="s4-hero-box">
+            <div class="s4-hero-icon">📚</div>
+            <div class="s4-hero-val">214</div>
+            <div class="s4-hero-label">Kanji Learned</div>
+          </div>
+          <div class="s4-streak-box">
+            <div class="s4-hero-icon">🔥</div>
+            <div class="s4-hero-val">7</div>
+            <div class="s4-hero-label">Day Streak</div>
+          </div>
+        </div>
+
+        <div class="s4-mini-row">
+          <div class="s4-mini-box">
+            <div class="s4-mini-val" style="color:#af52de;">143</div>
+            <div class="s4-mini-label">Mastered</div>
+          </div>
+          <div class="s4-mini-box">
+            <div class="s4-mini-val" style="color:#ff9500;">1,842</div>
+            <div class="s4-mini-label">Total Reviews</div>
+          </div>
+          <div class="s4-mini-box">
+            <div class="s4-mini-val" style="color:#34c759;">28</div>
+            <div class="s4-mini-label">Best Streak</div>
+          </div>
+        </div>
+
+        <div class="s4-chart-box">
+          <div class="s4-chart-title">Reviews This Week</div>
+          <div class="s4-bars">
+            <div class="s4-bar-col"><div class="s4-bar" style="height:35px;"></div><div class="s4-bar-label">M</div></div>
+            <div class="s4-bar-col"><div class="s4-bar" style="height:55px;"></div><div class="s4-bar-label">T</div></div>
+            <div class="s4-bar-col"><div class="s4-bar" style="height:28px;"></div><div class="s4-bar-label">W</div></div>
+            <div class="s4-bar-col"><div class="s4-bar" style="height:62px;"></div><div class="s4-bar-label">T</div></div>
+            <div class="s4-bar-col"><div class="s4-bar" style="height:44px;"></div><div class="s4-bar-label">F</div></div>
+            <div class="s4-bar-col"><div class="s4-bar" style="height:70px;"></div><div class="s4-bar-label">S</div></div>
+            <div class="s4-bar-col"><div class="s4-bar active" style="height:50px;"></div><div class="s4-bar-label" style="color:#007AFF;font-weight:700;">S</div></div>
+          </div>
+        </div>
+
+        <div class="s4-acc-row">
+          <div class="s4-acc-top">
+            <div class="s4-acc-label">Overall Accuracy</div>
+            <div class="s4-acc-pct">78%</div>
+          </div>
+          <div class="s4-acc-bar"><div class="s4-acc-fill"></div></div>
+        </div>
+
+        <div style="margin: 10px 20px 0; background:#fff; border-radius:14px; padding:12px 16px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+          <div style="font-size:13px;font-weight:600;color:#000;margin-bottom:8px;">Level Progress</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:11px;font-weight:700;color:#34c759;width:22px;">N5</span>
+              <div style="flex:1;height:6px;background:#f2f2f7;border-radius:3px;overflow:hidden;"><div style="height:100%;width:85%;background:#34c759;border-radius:3px;"></div></div>
+              <span style="font-size:10px;color:#8e8e93;">85%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:11px;font-weight:700;color:#007AFF;width:22px;">N4</span>
+              <div style="flex:1;height:6px;background:#f2f2f7;border-radius:3px;overflow:hidden;"><div style="height:100%;width:55%;background:#007AFF;border-radius:3px;"></div></div>
+              <span style="font-size:10px;color:#8e8e93;">55%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:11px;font-weight:700;color:#ff9500;width:22px;">N3</span>
+              <div style="flex:1;height:6px;background:#f2f2f7;border-radius:3px;overflow:hidden;"><div style="height:100%;width:13%;background:#ff9500;border-radius:3px;"></div></div>
+              <span style="font-size:10px;color:#8e8e93;">13%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      <h2>Track Your Progress</h2>
+      <p>Streaks, accuracy, level-by-level stats</p>
+    </div>
+  </div>
+
+  <!-- ══ Screenshot 5: Session Summary ══ -->
+  <div class="phone-wrap">
+    <div class="iphone">
+      <div class="iphone-screen s5">
+        <div class="dynamic-island"></div>
+        <div class="s5-confetti"></div>
+        <div class="status-bar" style="position:relative;z-index:10;">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#000" stroke-opacity="0.35"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#000"/><path d="M23 4.5V7.5a1.5 1.5 0 000-3z" fill="#000" opacity="0.4"/></svg>
+          </div>
+        </div>
+
+        <div style="position:relative;z-index:10;">
+          <div class="s5-trophy">🎉</div>
+          <div class="s5-title">Session Complete!</div>
+          <div class="s5-sub">You reviewed 10 kanji. Keep up the great work!</div>
+
+          <div class="s5-stats-grid">
+            <div class="s5-stat-card">
+              <div class="s5-stat-val" style="color:#007AFF;">10</div>
+              <div class="s5-stat-label">Cards Reviewed</div>
+            </div>
+            <div class="s5-stat-card">
+              <div class="s5-stat-val" style="color:#34c759;">90%</div>
+              <div class="s5-stat-label">Accuracy</div>
+            </div>
+            <div class="s5-stat-card">
+              <div class="s5-stat-val" style="color:#ff9500;">🔥 7</div>
+              <div class="s5-stat-label">Day Streak</div>
+            </div>
+            <div class="s5-stat-card">
+              <div class="s5-stat-val" style="color:#af52de;">143</div>
+              <div class="s5-stat-label">Mastered</div>
+            </div>
+          </div>
+
+          <div class="s5-streak-banner">
+            <div class="s5-streak-icon">🔥</div>
+            <div class="s5-streak-text">
+              <div class="s5-streak-title">7-Day Streak!</div>
+              <div class="s5-streak-sub">Come back tomorrow to keep it going</div>
+            </div>
+          </div>
+
+          <div class="s5-next-btn">Back to Study</div>
+          <div class="s5-practice-btn">Keep Practicing</div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">
+      <h2>Celebrate Every Session</h2>
+      <p>Streaks, accuracy, keep practicing mode</p>
+    </div>
+  </div>
+
+</div>
+
+<div style="color:rgba(255,255,255,0.35);font-size:13px;text-align:center;max-width:600px;">
+  These mockups represent the app at 6.7″ iPhone proportions (1290×2796 px target).<br>
+  Open each screenshot individually and use browser print / screenshot at 3× scale for App Store Connect.
+</div>
+
+</body>
+</html>
