@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Background: white like the Japanese flag -->
+  <rect width="1024" height="1024" rx="224" ry="224" fill="#FFFFFF"/>
+
+  <!-- Red circle (Hinomaru) -->
+  <circle cx="512" cy="480" r="320" fill="#BC002D"/>
+
+  <!-- Kanji character 漢 in white, centered in the circle -->
+  <text x="512" y="520"
+        font-family="Hiragino Sans, Hiragino Kaku Gothic ProN, Yu Gothic, Noto Sans JP, sans-serif"
+        font-size="380"
+        font-weight="300"
+        fill="#FFFFFF"
+        text-anchor="middle"
+        dominant-baseline="central">漢</text>
+
+  <!-- Subtle app name at the bottom -->
+  <text x="512" y="900"
+        font-family="-apple-system, SF Pro Display, Helvetica Neue, sans-serif"
+        font-size="80"
+        font-weight="700"
+        fill="#1d1d1f"
+        text-anchor="middle"
+        letter-spacing="-2">KANJI</text>
+</svg>
