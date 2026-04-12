@@ -8,7 +8,7 @@ Copy and paste each section into the corresponding field in App Store Connect.
 ## App Name (30 chars max)
 
 ```
-Kanji Flashcard — JLPT Study
+Kanji Flash — JLPT Study
 ```
 
 ## Subtitle (30 chars max)
