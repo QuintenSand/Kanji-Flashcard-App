@@ -218,7 +218,7 @@ private struct HowItWorksPage: View {
                             }
                         }
                         .opacity(flipped ? 1 : 0)
-                        .rotation3DEffect(.degrees(flipped ? 0 : -180), axis: (x: 0, y: 1, z: 0))
+                        .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
                 }
                 .frame(maxWidth: 300)
                 .rotation3DEffect(.degrees(flipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
