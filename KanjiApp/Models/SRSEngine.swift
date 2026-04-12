@@ -119,4 +119,28 @@ struct SRSEngine {
         let newBatch = Array(newKanji.prefix(limit - dueBatch.count))
         return (dueBatch + newBatch).shuffled()
     }
+
+    /// Cards for extra practice: already studied but not yet due, sorted by
+    /// soonest upcoming review date first (i.e. closest to due = most useful to revisit).
+    static func practiceCards(
+        from cards: [String: SRSCard],
+        levels: Set<JLPTLevel>,
+        limit: Int = 20
+    ) -> [Kanji] {
+        let allKanji = KanjiDatabase.all.filter { levels.contains($0.level) }
+
+        // Only cards that have been studied at least once and are NOT yet due
+        let practiceKanji = allKanji
+            .filter { kanji in
+                guard let card = cards[kanji.id] else { return false }
+                return card.repetitions > 0 && !card.isDueForReview
+            }
+            .sorted { a, b in
+                let aDate = cards[a.id]?.nextReviewDate ?? .distantFuture
+                let bDate = cards[b.id]?.nextReviewDate ?? .distantFuture
+                return aDate < bDate
+            }
+
+        return Array(practiceKanji.prefix(limit))
+    }
 }

@@ -20,13 +20,22 @@ struct StudyView: View {
         min(dueKanji.count, appState.sessionSize)
     }
 
+    // Practice cards available when the daily queue is empty.
+    private var practiceKanji: [Kanji] {
+        SRSEngine.practiceCards(from: appState.cards, levels: appState.selectedLevels, limit: 10_000)
+    }
+
+    private var practiceCardCount: Int {
+        min(practiceKanji.count, appState.sessionSize)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
 
                     // ── Due today banner
-                    DueTodayBanner(dueCount: dueKanji.count)
+                    DueTodayBanner(dueCount: dueKanji.count, practiceCount: practiceKanji.count)
                         .padding(.horizontal)
 
                     // ── Level selector
@@ -79,31 +88,73 @@ struct StudyView: View {
                         .padding(.horizontal)
                     }
 
-                    // ── Start session button
-                    Button {
-                        // Snapshot the queue at tap time so fullScreenCover
-                        // always receives the current sessionSize.
-                        sessionQueue = SRSEngine.dueCards(
-                            from: appState.cards,
-                            levels: appState.selectedLevels,
-                            limit: appState.sessionSize
-                        )
-                        showSession = true
-                    } label: {
-                        HStack {
-                            Image(systemName: dueKanji.isEmpty ? "checkmark.circle.fill" : "play.fill")
-                                .font(.title3)
-                            Text(dueKanji.isEmpty ? "All caught up!" : "Start Review (\(sessionCardCount))")
-                                .font(.headline)
+                    // ── Start session / Keep practicing buttons
+                    if dueKanji.isEmpty {
+                        // Daily queue done — show extra practice option
+                        VStack(spacing: 10) {
+                            // Disabled "all done" indicator
+                            HStack {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.title3)
+                                Text("All caught up!")
+                                    .font(.headline)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(.systemGray4))
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                            // Keep practicing button (only shown when there are studied cards)
+                            if !practiceKanji.isEmpty {
+                                Button {
+                                    sessionQueue = SRSEngine.practiceCards(
+                                        from: appState.cards,
+                                        levels: appState.selectedLevels,
+                                        limit: appState.sessionSize
+                                    )
+                                    showSession = true
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "arrow.clockwise.circle.fill")
+                                            .font(.title3)
+                                        Text("Keep Practicing (\(practiceCardCount))")
+                                            .font(.headline)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.green)
+                                    .foregroundStyle(.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                                }
+                            }
                         }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(dueKanji.isEmpty ? Color(.systemGray4) : Color.accentColor)
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .padding(.horizontal)
+                    } else {
+                        Button {
+                            // Snapshot the queue at tap time so fullScreenCover
+                            // always receives the current sessionSize.
+                            sessionQueue = SRSEngine.dueCards(
+                                from: appState.cards,
+                                levels: appState.selectedLevels,
+                                limit: appState.sessionSize
+                            )
+                            showSession = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "play.fill")
+                                    .font(.title3)
+                                Text("Start Review (\(sessionCardCount))")
+                                    .font(.headline)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.accentColor)
+                            .foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                        }
+                        .padding(.horizontal)
                     }
-                    .disabled(dueKanji.isEmpty)
-                    .padding(.horizontal)
 
                     // ── Quick stats strip
                     HStack(spacing: 0) {
@@ -138,20 +189,23 @@ struct StudyView: View {
 // MARK: - Due Today Banner
 private struct DueTodayBanner: View {
     let dueCount: Int
+    let practiceCount: Int
 
     var body: some View {
         HStack(spacing: 16) {
             ZStack {
-                Circle().fill(Color.accentColor.opacity(0.15)).frame(width: 52, height: 52)
-                Text("\(dueCount)")
+                Circle()
+                    .fill((dueCount == 0 ? Color.green : Color.accentColor).opacity(0.15))
+                    .frame(width: 52, height: 52)
+                Text(dueCount == 0 ? "✓" : "\(dueCount)")
                     .font(.title2.weight(.bold))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(dueCount == 0 ? Color.green : Color.accentColor)
             }
             VStack(alignment: .leading, spacing: 2) {
-                Text(dueCount == 0 ? "All done for today 🎉" : "Cards due today")
+                Text(dueCount == 0 ? "All done for today! 🎉" : "Cards due today")
                     .font(.headline)
                 Text(dueCount == 0
-                     ? "Come back later for more reviews"
+                     ? (practiceCount > 0 ? "\(practiceCount) cards available for extra practice" : "Come back tomorrow for more reviews")
                      : "Keep your streak going!")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
