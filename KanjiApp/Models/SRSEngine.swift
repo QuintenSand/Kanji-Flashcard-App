@@ -133,7 +133,9 @@ struct SRSEngine {
         let practiceKanji = allKanji
             .filter { kanji in
                 guard let card = cards[kanji.id] else { return false }
-                return card.repetitions > 0 && !card.isDueForReview
+                // Use totalReviews (not repetitions) so cards rated "Again"
+                // (which reset repetitions to 0) still appear in practice.
+                return card.totalReviews > 0 && !card.isDueForReview
             }
             .sorted { a, b in
                 let aDate = cards[a.id]?.nextReviewDate ?? .distantFuture

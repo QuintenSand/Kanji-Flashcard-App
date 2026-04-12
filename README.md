@@ -8,9 +8,10 @@ A native iOS flashcard app for learning Japanese kanji across all five JLPT leve
 
 - **Spaced-Repetition System (SRS)** — SM-2 algorithm schedules reviews at optimal intervals so you study smarter, not harder
 - **Full JLPT Coverage** — N5 through N1 kanji database with meanings, on'yomi, kun'yomi, stroke count, and example words
-- **Flashcard Sessions** — Tap to flip, swipe to rate; four-button rating system (Again / Hard / Good / Easy)
+- **Flashcard Sessions** — Tap to flip, swipe to rate; four-button rating system (Again / Hard / Good / Easy); cards rated Again are re-queued within the same session so you see them again before finishing
 - **Kanji Library** — Browse and search all kanji with live level filters; each card shows your SRS progress
 - **Statistics Dashboard** — Streak tracking, accuracy graph, activity heatmap (last 12 weeks), per-level progress bars, and recent session history
+- **Keep Practicing** — After finishing a session the summary screen offers a one-tap "Keep Practicing" button to start another round without navigating back; the button is hidden when no practice cards remain
 - **Persistent Progress** — All review data is saved locally via `UserDefaults`; no account or internet required
 
 ---
@@ -88,7 +89,7 @@ Reviews use the **SM-2** algorithm, the same algorithm behind Anki:
 
 | Rating | Key | SM-2 quality |
 |--------|-----|--------------|
-| Again  | 🔴  | 1 — reset interval to 1 day |
+| Again  | 🔴  | 1 — reset interval to 1 day; card is re-queued at the end of the current session |
 | Hard   | 🟠  | 2 — correct but difficult; small interval increase |
 | Good   | 🟢  | 4 — correct with hesitation; normal interval increase |
 | Easy   | ⭐️ | 5 — perfect recall; extra +1 day bonus |

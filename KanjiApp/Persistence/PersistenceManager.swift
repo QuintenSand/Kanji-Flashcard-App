@@ -30,6 +30,11 @@ final class AppState: ObservableObject {
         didSet { defaults.set(sessionSize, forKey: Keys.sessionSize) }
     }
 
+    // ── Onboarding
+    @Published var hasCompletedOnboarding: Bool = false {
+        didSet { defaults.set(hasCompletedOnboarding, forKey: Keys.hasCompletedOnboarding) }
+    }
+
     // ── Notification preferences
     @Published var notificationsEnabled: Bool = false {
         didSet {
@@ -59,9 +64,10 @@ final class AppState: ObservableObject {
         static let sessionHistory       = "session_history_v1"
         static let selectedLevels       = "selected_levels_v1"
         static let sessionSize          = "session_size_v1"
-        static let notificationsEnabled = "notifications_enabled_v1"
-        static let notificationHour     = "notification_hour_v1"
-        static let notificationMinute   = "notification_minute_v1"
+        static let notificationsEnabled      = "notifications_enabled_v1"
+        static let notificationHour          = "notification_hour_v1"
+        static let notificationMinute        = "notification_minute_v1"
+        static let hasCompletedOnboarding    = "has_completed_onboarding_v1"
     }
 
     init() { load() }
@@ -137,6 +143,19 @@ final class AppState: ObservableObject {
         }
     }
 
+    // MARK: - Reset
+
+    /// Wipes all SRS progress, study dates, and session history.
+    /// User preferences (levels, session size, notifications) are kept.
+    func resetProgress() {
+        cards                  = [:]
+        studyDates             = []
+        sessionHistory         = []
+        defaults.removeObject(forKey: Keys.cards)
+        defaults.removeObject(forKey: Keys.studyDates)
+        defaults.removeObject(forKey: Keys.sessionHistory)
+    }
+
     // MARK: - Notifications
 
     func rescheduleNotification() {
@@ -171,10 +190,11 @@ final class AppState: ObservableObject {
             selectedLevels = Set(raws.compactMap { JLPTLevel(rawValue: $0) })
             if selectedLevels.isEmpty { selectedLevels = [.N5] }
         }
-        sessionSize          = defaults.object(forKey: Keys.sessionSize)         as? Int ?? 10
-        notificationsEnabled = defaults.bool(forKey: Keys.notificationsEnabled)
-        notificationHour     = defaults.object(forKey: Keys.notificationHour)    as? Int ?? 9
-        notificationMinute   = defaults.object(forKey: Keys.notificationMinute)  as? Int ?? 0
+        sessionSize               = defaults.object(forKey: Keys.sessionSize)              as? Int ?? 10
+        notificationsEnabled      = defaults.bool(forKey: Keys.notificationsEnabled)
+        notificationHour          = defaults.object(forKey: Keys.notificationHour)         as? Int ?? 9
+        notificationMinute        = defaults.object(forKey: Keys.notificationMinute)       as? Int ?? 0
+        hasCompletedOnboarding    = defaults.bool(forKey: Keys.hasCompletedOnboarding)
     }
 }
 
