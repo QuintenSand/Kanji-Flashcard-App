@@ -37,6 +37,8 @@ struct OnboardingView: View {
                             .animation(.spring(response: 0.3), value: page)
                     }
                 }
+                .accessibilityElement()
+                .accessibilityLabel("Page \(page + 1) of \(totalPages)")
 
                 // Next / Start button
                 Button {
@@ -80,6 +82,7 @@ struct OnboardingView: View {
 
 // MARK: - Page 1: Welcome
 private struct WelcomePage: View {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var appeared = false
 
     var body: some View {
@@ -134,15 +137,22 @@ private struct WelcomePage: View {
             .padding(.horizontal, 32)
         }
         .onAppear {
-            withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1)) {
+            if reduceMotion {
                 appeared = true
+            } else {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1)) {
+                    appeared = true
+                }
             }
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Welcome. Kanji Flashcard App. Master all 1,318 JLPT kanji with science-backed spaced repetition.")
     }
 }
 
 // MARK: - Page 2: How it works
 private struct HowItWorksPage: View {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var flipped    = false
     @State private var appeared   = false
     @State private var showRating = false
@@ -223,17 +233,24 @@ private struct HowItWorksPage: View {
                 .frame(maxWidth: 300)
                 .rotation3DEffect(.degrees(flipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
                 .onTapGesture {
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                    if reduceMotion {
                         flipped.toggle()
-                    }
-                    if !showRating {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                            withAnimation { showRating = true }
+                        showRating = true
+                    } else {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                            flipped.toggle()
+                        }
+                        if !showRating {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                withAnimation { showRating = true }
+                            }
                         }
                     }
                 }
                 .opacity(appeared ? 1 : 0)
                 .offset(y: appeared ? 0 : 30)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(flipped ? "Demo card showing: mountain, On'yomi San, Kun'yomi yama" : "Demo flashcard showing kanji for mountain. Tap to flip.")
 
                 Spacer().frame(height: 20)
 
@@ -266,13 +283,23 @@ private struct HowItWorksPage: View {
             .padding(.horizontal, 24)
         }
         .onAppear {
-            withAnimation(.easeOut(duration: 0.5).delay(0.1)) { appeared = true }
-            // Auto-flip after 1.5 s so the user sees the demo without having to tap
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                guard !flipped else { return }
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { flipped = true }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    withAnimation { showRating = true }
+            if reduceMotion {
+                appeared = true
+                // Auto-flip without animation
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    guard !flipped else { return }
+                    flipped = true
+                    showRating = true
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.5).delay(0.1)) { appeared = true }
+                // Auto-flip after 1.5 s so the user sees the demo without having to tap
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    guard !flipped else { return }
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { flipped = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        withAnimation { showRating = true }
+                    }
                 }
             }
         }
@@ -433,6 +460,7 @@ private struct ChooseLevelPage: View {
                                             .frame(width: 14, height: 14)
                                     }
                                 }
+                                .accessibilityHidden(true)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     HStack {
@@ -460,6 +488,9 @@ private struct ChooseLevelPage: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("\(level.rawValue), \(level.kanjiCount) kanji. \(descriptions[level] ?? "")")
+                        .accessibilityAddTraits(isSelected ? .isSelected : [])
+                        .accessibilityHint("Double-tap to select this level")
                     }
                 }
                 .padding(.horizontal, 24)

@@ -78,6 +78,8 @@ private struct KPITile: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
 
@@ -129,6 +131,7 @@ private struct MasteryRow: View {
     var body: some View {
         HStack(spacing: 10) {
             Circle().fill(color).frame(width: 8, height: 8)
+                .accessibilityHidden(true)
             Text(label).font(.subheadline).frame(width: 100, alignment: .leading)
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
@@ -138,9 +141,12 @@ private struct MasteryRow: View {
                 }
             }
             .frame(height: 8)
+            .accessibilityHidden(true)
             Text("\(value)").font(.caption.weight(.semibold)).foregroundStyle(color)
                 .frame(width: 36, alignment: .trailing)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value) of \(total) kanji")
     }
 }
 
@@ -199,6 +205,8 @@ private struct LevelBreakdownRow: View {
                 .foregroundStyle(color)
                 .frame(width: 36, alignment: .trailing)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(level.rawValue): \(String(format: "%.0f", progress * 100)) percent progress")
     }
 }
 
@@ -220,6 +228,12 @@ private struct ActivityHeatmap: View {
         return fmt.string(from: d)
     }
 
+    private var studiedDaysCount: Int {
+        let cal = Calendar.current
+        let cutoff = cal.date(byAdding: .day, value: -(columns * rows), to: Date())!
+        return appState.studyDates.filter { $0 >= cutoff }.count
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Activity (last 12 weeks)")
@@ -239,6 +253,7 @@ private struct ActivityHeatmap: View {
                     }
                 }
             }
+            .accessibilityHidden(true)
 
             HStack {
                 Circle().fill(Color(.systemGray5)).frame(width: 8)
@@ -247,10 +262,13 @@ private struct ActivityHeatmap: View {
                 Circle().fill(Color.accentColor).frame(width: 8)
                 Text("Studied").font(.caption2).foregroundStyle(.secondary)
             }
+            .accessibilityHidden(true)
         }
         .padding()
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Activity heatmap, last 12 weeks. You studied on \(studiedDaysCount) of \(columns * rows) days.")
     }
 }
 
@@ -282,6 +300,8 @@ private struct RecentSessionsSection: View {
                         .foregroundStyle(session.accuracy >= 0.7 ? .green : .orange)
                 }
                 .padding(.vertical, 4)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Session: \(session.reviewed) cards reviewed, \(String(format: "%.0f", session.accuracy * 100)) percent accuracy, \(session.durationSeconds / 60) minutes")
                 Divider()
             }
         }

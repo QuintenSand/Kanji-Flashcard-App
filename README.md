@@ -13,6 +13,7 @@ A native iOS flashcard app for learning Japanese kanji across all five JLPT leve
 - **Statistics Dashboard** — Streak tracking, accuracy graph, activity heatmap (last 12 weeks), per-level progress bars, and recent session history
 - **Keep Practicing** — After finishing a session the summary screen offers a one-tap "Keep Practicing" button to start another round without navigating back; the button is hidden when no practice cards remain
 - **Persistent Progress** — All review data is saved locally via `UserDefaults`; no account or internet required
+- **Accessibility** — VoiceOver labels and hints on all interactive elements, Dynamic Type–friendly text, Reduce Motion support for card flip and transition animations, and meaningful element grouping for screen readers
 
 ---
 
@@ -36,7 +37,7 @@ Each kanji includes meanings, on'yomi, kun'yomi, stroke count, and at least two 
 | Requirement | Version |
 |-------------|---------|
 | Xcode       | 16.0+   |
-| iOS         | 17.0+   |
+| iOS         | 16.6+   |
 | Swift       | 5.10+   |
 
 No third-party dependencies — the project uses only Apple frameworks (SwiftUI, Foundation, Combine).
@@ -71,14 +72,29 @@ KanjiApp/
 │   └── PersistenceManager.swift # AppState (ObservableObject), UserDefaults I/O,
 │                                 # StudySession model, streak & accuracy helpers
 │
+├── Notifications/
+│   └── NotificationManager.swift # Daily reminder scheduling, badge management
+│
 └── Views/
     ├── Library/
     │   └── LibraryView.swift   # Kanji grid, search, level chips, detail view
     ├── Study/
     │   ├── StudyView.swift     # Study home, level selector, due-card banner
     │   └── SessionView.swift   # Full-screen flashcard session + summary screen
-    └── Stats/
-        └── StatsView.swift     # KPI strip, mastery overview, heatmap, sessions
+    ├── Stats/
+    │   └── StatsView.swift     # KPI strip, mastery overview, heatmap, sessions
+    ├── Onboarding/
+    │   └── OnboardingView.swift # 4-page first-time user flow with level selection
+    └── Settings/
+        └── SettingsView.swift  # Notifications, study preferences, reset, about
+
+KanjiAppTests/                      # Unit test suite
+├── SRSEngineTests.swift            # SM-2 algorithm correctness (24 tests)
+├── SRSCardTests.swift              # Card model properties & edge cases (12 tests)
+├── KanjiModelTests.swift           # Kanji, JLPTLevel, KanjiExample (19 tests)
+├── AppStateTests.swift             # Streaks, stats, reset, persistence (22 tests)
+├── KanjiDatabaseTests.swift        # Database integrity & completeness (15 tests)
+└── StudySessionTests.swift         # Session model (8 tests)
 ```
 
 ---

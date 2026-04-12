@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>App Store Screenshots — Export</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    background: #111;
+  }
+
+  /* Navigation bar to switch between screenshots */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #222; padding: 12px 20px;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .nav button {
+    padding: 8px 16px; border: none; border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-weight: 600; background: #444; color: #fff;
+  }
+  .nav button.active { background: #007AFF; }
+  .nav .info {
+    margin-left: auto; color: #888; font-size: 12px;
+  }
+
+  /* Each screenshot page — exact 6.7" iPhone dimensions */
+  .page {
+    display: none;
+    width: 1290px;
+    height: 2796px;
+    position: relative;
+    overflow: hidden;
+    margin: 60px auto 40px;
+  }
+  .page.active { display: block; }
+
+  /* ═══════════════════════════════════════
+     SHARED STYLES
+  ═══════════════════════════════════════ */
+  .screen-bg { position: absolute; inset: 0; background: #f2f2f7; }
+  .status-bar {
+    height: 150px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 72px 24px;
+    position: relative; z-index: 50;
+  }
+  .status-time { font-size: 48px; font-weight: 600; color: #000; }
+  .status-icons { font-size: 38px; color: #000; display: flex; gap: 12px; align-items: center; letter-spacing: 1px; }
+
+  .nav-title {
+    padding: 12px 60px 36px;
+    font-size: 100px; font-weight: 800; letter-spacing: -2px; color: #000;
+  }
+
+  /* Tab bar */
+  .tab-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 240px;
+    background: rgba(249,249,249,0.94);
+    border-top: 1px solid #d1d1d6;
+    display: flex; justify-content: space-around; align-items: flex-start;
+    padding-top: 30px;
+    backdrop-filter: blur(20px);
+  }
+  .tab-item { text-align: center; flex: 1; }
+  .tab-icon { font-size: 72px; margin-bottom: 8px; }
+  .tab-label { font-size: 30px; font-weight: 500; color: #8e8e93; }
+  .tab-item.active .tab-icon { color: #007AFF; }
+  .tab-item.active .tab-label { color: #007AFF; font-weight: 600; }
+
+  /* Pill / badge */
+  .level-badge {
+    display: inline-block;
+    font-size: 36px; font-weight: 700;
+    padding: 10px 32px; border-radius: 60px;
+  }
+
+  /* ═══════════════════════════════════════
+     SCREEN 1: WELCOME / ONBOARDING
+  ═══════════════════════════════════════ */
+  .s1-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(165deg, rgba(0,122,255,0.12) 0%, #f2f2f7 55%);
+  }
+  .s1-content {
+    position: relative; z-index: 10;
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 360px;
+  }
+  .s1-circle {
+    width: 520px; height: 520px; border-radius: 50%;
+    background: rgba(0,122,255,0.10);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .s1-kanji { font-size: 340px; font-weight: 100; color: #007AFF; line-height: 1; }
+  .s1-jp { font-size: 48px; color: #8e8e93; margin-top: 80px; }
+  .s1-title { font-size: 116px; font-weight: 800; color: #000; line-height: 1.05; text-align: center; letter-spacing: -3px; margin-top: 24px; }
+  .s1-sub { font-size: 46px; color: #636366; line-height: 1.5; text-align: center; margin-top: 36px; }
+  .s1-dots {
+    display: flex; gap: 18px; justify-content: center; margin-top: 80px;
+  }
+  .s1-dot { width: 24px; height: 24px; border-radius: 12px; background: #c7c7cc; }
+  .s1-dot.active { width: 60px; background: #007AFF; }
+  .s1-btn {
+    margin-top: 48px; width: 80%;
+    background: #007AFF; color: #fff; border-radius: 46px;
+    padding: 46px; text-align: center;
+    font-size: 50px; font-weight: 600;
+  }
+  .s1-skip { text-align: center; color: #8e8e93; font-size: 40px; margin-top: 32px; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 2: FLASHCARD SESSION
+  ═══════════════════════════════════════ */
+  .s2-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 60px 36px;
+  }
+  .s2-close {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: #e5e5ea; display: flex; align-items: center; justify-content: center;
+    font-size: 44px; color: #3a3a3c; font-weight: 600;
+  }
+  .s2-counter { font-size: 42px; color: #8e8e93; }
+  .s2-accuracy {
+    font-size: 42px; font-weight: 700; color: #34c759;
+    background: rgba(52,199,89,0.1); padding: 16px 28px; border-radius: 50px;
+  }
+  .s2-progress {
+    margin: 0 60px 48px; height: 12px; background: #e5e5ea; border-radius: 6px; overflow: hidden;
+  }
+  .s2-progress-fill { height: 100%; width: 50%; background: #007AFF; border-radius: 6px; }
+  .s2-card {
+    margin: 0 60px;
+    background: #fff; border-radius: 72px;
+    box-shadow: 0 24px 72px rgba(0,0,0,0.09);
+    padding: 80px 60px 60px;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 1200px;
+  }
+  .s2-card-badge {
+    background: rgba(255,149,0,0.15); color: #ff9500;
+    font-size: 36px; font-weight: 700;
+    padding: 10px 32px; border-radius: 60px;
+  }
+  .s2-card-kanji { font-size: 300px; font-weight: 100; color: #000; margin-top: 24px; }
+  .s2-card-meaning { font-size: 72px; font-weight: 700; color: #000; margin-top: 12px; }
+  .s2-card-divider { width: 60%; height: 3px; background: #e5e5ea; margin: 40px 0; }
+  .s2-readings { display: flex; gap: 100px; }
+  .s2-reading-col { text-align: center; }
+  .s2-reading-label { font-size: 34px; font-weight: 600; margin-bottom: 8px; }
+  .s2-reading-val { font-size: 48px; font-weight: 500; color: #000; }
+  .s2-example {
+    margin-top: 48px; background: #f2f2f7; border-radius: 36px;
+    padding: 36px 48px; text-align: center;
+  }
+  .s2-ex-word { font-size: 56px; font-weight: 600; }
+  .s2-ex-reading { font-size: 34px; color: #8e8e93; margin-top: 4px; }
+  .s2-ex-meaning { font-size: 34px; color: #8e8e93; }
+  .s2-rating-row {
+    display: flex; gap: 24px; margin: 48px 60px 0; padding-bottom: 260px;
+  }
+  .s2-rate-btn {
+    flex: 1; border-radius: 40px; padding: 32px 12px;
+    text-align: center; border: 3px solid transparent;
+  }
+  .s2-rate-emoji { font-size: 56px; }
+  .s2-rate-label { font-size: 36px; font-weight: 700; margin-top: 8px; }
+  .btn-again { background: rgba(255,59,48,0.09); color: #ff3b30; border-color: rgba(255,59,48,0.25); }
+  .btn-hard  { background: rgba(255,149,0,0.09); color: #ff9500; border-color: rgba(255,149,0,0.25); }
+  .btn-good  { background: rgba(52,199,89,0.09); color: #34c759; border-color: rgba(52,199,89,0.25); }
+  .btn-easy  { background: rgba(0,122,255,0.09); color: #007AFF; border-color: rgba(0,122,255,0.25); }
+
+  /* ═══════════════════════════════════════
+     SCREEN 3: STUDY HOME
+  ═══════════════════════════════════════ */
+  .s3-banner {
+    margin: 0 60px 48px;
+    background: #fff; border-radius: 48px;
+    padding: 48px; display: flex; align-items: center; gap: 48px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+  }
+  .s3-banner-circle {
+    width: 160px; height: 160px; border-radius: 50%;
+    background: rgba(0,122,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 72px; font-weight: 800; color: #007AFF;
+    flex-shrink: 0;
+  }
+  .s3-banner-title { font-size: 52px; font-weight: 700; color: #000; }
+  .s3-banner-sub { font-size: 38px; color: #8e8e93; margin-top: 6px; }
+  .s3-section-title { font-size: 50px; font-weight: 700; color: #000; padding: 0 60px; margin-bottom: 32px; }
+  .s3-level-scroll {
+    display: flex; gap: 28px; padding: 0 60px; margin-bottom: 56px; overflow: hidden;
+  }
+  .s3-level-card {
+    width: 380px; flex-shrink: 0;
+    padding: 40px; border-radius: 40px;
+    border: 4px solid transparent;
+  }
+  .s3-lc-selected { border-color: currentColor; }
+  .s3-lc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .s3-lc-level { font-size: 48px; font-weight: 800; }
+  .s3-lc-check { font-size: 36px; }
+  .s3-lc-count { font-size: 32px; color: #8e8e93; margin-bottom: 20px; }
+  .s3-lc-bar { height: 18px; border-radius: 9px; overflow: hidden; margin-bottom: 12px; }
+  .s3-lc-bar-bg { width: 100%; height: 100%; border-radius: 9px; position: relative; }
+  .s3-lc-bar-fill { height: 100%; border-radius: 9px; position: absolute; top: 0; left: 0; }
+  .s3-lc-pct { font-size: 32px; font-weight: 700; }
+  .s3-size-title { font-size: 50px; font-weight: 700; color: #000; padding: 0 60px; margin-bottom: 28px; }
+  .s3-size-row { display: flex; gap: 24px; padding: 0 60px; margin-bottom: 56px; }
+  .s3-size-btn {
+    flex: 1; padding: 30px; border-radius: 36px;
+    text-align: center; font-size: 44px; font-weight: 700;
+  }
+  .s3-start-btn {
+    margin: 0 60px 48px;
+    background: #007AFF; color: #fff; border-radius: 48px;
+    padding: 50px; text-align: center;
+    font-size: 50px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+  }
+  .s3-stats-strip {
+    margin: 0 60px; padding: 48px;
+    background: #fff; border-radius: 48px;
+    display: flex; box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+  }
+  .s3-stat { flex: 1; text-align: center; }
+  .s3-stat-icon { font-size: 36px; color: #007AFF; margin-bottom: 12px; }
+  .s3-stat-val { font-size: 56px; font-weight: 800; color: #000; }
+  .s3-stat-label { font-size: 30px; color: #8e8e93; margin-top: 4px; }
+  .s3-stat-divider { width: 3px; background: #e5e5ea; margin: 0; align-self: stretch; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 4: LIBRARY
+  ═══════════════════════════════════════ */
+  .s4-search {
+    margin: 0 60px 40px;
+    background: rgba(118,118,128,0.12); border-radius: 36px;
+    padding: 30px 42px;
+    font-size: 44px; color: #8e8e93;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .s4-pill-row { display: flex; gap: 24px; padding: 0 60px 48px; }
+  .s4-pill {
+    padding: 16px 42px; border-radius: 60px;
+    font-size: 38px; font-weight: 700;
+    border: 3px solid transparent;
+  }
+  .s4-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 24px; padding: 0 60px; margin-bottom: 40px;
+  }
+  .s4-cell {
+    background: #fff; border-radius: 40px;
+    aspect-ratio: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .s4-cell-char { font-size: 72px; font-weight: 300; color: #000; }
+  .s4-cell-mean { font-size: 22px; color: #8e8e93; margin-top: 6px; text-align: center; }
+  .s4-cell-dot {
+    position: absolute; top: 16px; right: 16px;
+    width: 22px; height: 22px; border-radius: 50%;
+  }
+  .s4-cell-border { border: 4px solid; }
+  .s4-level-progress {
+    margin: 12px 60px 0;
+    background: #fff; border-radius: 48px;
+    padding: 44px 48px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+  }
+  .s4-lp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .s4-lp-badge { font-size: 40px; font-weight: 700; padding: 8px 28px; border-radius: 24px; }
+  .s4-lp-count { font-size: 36px; color: #8e8e93; }
+  .s4-lp-bar { height: 18px; border-radius: 9px; overflow: hidden; }
+  .s4-lp-bar-fill { height: 100%; border-radius: 9px; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 5: STATISTICS
+  ═══════════════════════════════════════ */
+  .s5-kpi-strip {
+    margin: 0 60px 40px;
+    background: #fff; border-radius: 54px;
+    padding: 52px; display: flex;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+  }
+  .s5-kpi { flex: 1; text-align: center; }
+  .s5-kpi-icon { font-size: 44px; margin-bottom: 16px; }
+  .s5-kpi-val { font-size: 68px; font-weight: 800; }
+  .s5-kpi-label { font-size: 34px; color: #8e8e93; margin-top: 8px; }
+  .s5-kpi-divider { width: 3px; background: #e5e5ea; align-self: stretch; }
+  .s5-section {
+    margin: 0 60px 40px;
+    background: #fff; border-radius: 54px;
+    padding: 52px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.04);
+  }
+  .s5-section-title { font-size: 48px; font-weight: 700; margin-bottom: 36px; }
+  .s5-mastery-row {
+    display: flex; align-items: center; gap: 24px; margin-bottom: 24px;
+  }
+  .s5-mastery-dot { width: 24px; height: 24px; border-radius: 12px; flex-shrink: 0; }
+  .s5-mastery-label { font-size: 40px; width: 300px; }
+  .s5-mastery-bar { flex: 1; height: 24px; border-radius: 12px; overflow: hidden; position: relative; }
+  .s5-mastery-bar-bg { width: 100%; height: 100%; border-radius: 12px; position: absolute; }
+  .s5-mastery-bar-fill { height: 100%; border-radius: 12px; position: absolute; }
+  .s5-mastery-val { font-size: 36px; font-weight: 700; width: 120px; text-align: right; }
+  .s5-level-row {
+    display: flex; align-items: center; gap: 32px; margin-bottom: 20px;
+  }
+  .s5-level-name { font-size: 40px; font-weight: 800; width: 90px; }
+  .s5-level-bar { flex: 1; height: 30px; border-radius: 15px; overflow: hidden; position: relative; }
+  .s5-level-bar-bg { width: 100%; height: 100%; border-radius: 15px; position: absolute; }
+  .s5-level-bar-fill { height: 100%; border-radius: 15px; position: absolute; }
+  .s5-level-pct { font-size: 36px; font-weight: 700; width: 110px; text-align: right; }
+  .s5-heatmap-grid {
+    display: flex; gap: 9px;
+  }
+  .s5-heatmap-col { display: flex; flex-direction: column; gap: 9px; }
+  .s5-heatmap-cell { width: 44px; height: 44px; border-radius: 8px; }
+  .s5-footer-row { display: flex; gap: 16px; align-items: center; margin-top: 28px; }
+  .s5-footer-dot { width: 24px; height: 24px; border-radius: 12px; }
+  .s5-footer-label { font-size: 28px; color: #8e8e93; }
+
+  /* ═══════════════════════════════════════
+     SCREEN 6: SESSION SUMMARY
+  ═══════════════════════════════════════ */
+  .s6-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(165deg, rgba(0,122,255,0.08) 0%, rgba(52,199,89,0.06) 100%);
+  }
+  .s6-content { position: relative; z-index: 10; }
+  .s6-emoji { font-size: 220px; text-align: center; margin-top: 200px; }
+  .s6-title { text-align: center; font-size: 84px; font-weight: 800; letter-spacing: -2px; color: #000; margin-top: 24px; }
+  .s6-sub { text-align: center; font-size: 44px; color: #636366; margin-top: 20px; padding: 0 80px; }
+  .s6-stats-grid {
+    display: flex; gap: 28px; margin: 60px 60px 0; flex-wrap: wrap;
+  }
+  .s6-stat-card {
+    flex: 1; min-width: calc(50% - 14px);
+    background: #fff; border-radius: 48px;
+    padding: 44px; text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  }
+  .s6-stat-val { font-size: 80px; font-weight: 800; }
+  .s6-stat-label { font-size: 36px; color: #8e8e93; margin-top: 8px; }
+  .s6-streak-banner {
+    margin: 40px 60px 0;
+    background: linear-gradient(135deg, #ff9500, #ff6b00);
+    border-radius: 44px; padding: 40px 48px;
+    display: flex; align-items: center; gap: 36px;
+  }
+  .s6-streak-icon { font-size: 80px; }
+  .s6-streak-title { font-size: 46px; font-weight: 700; color: #fff; }
+  .s6-streak-sub { font-size: 36px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+  .s6-btn-primary {
+    margin: 48px 60px 0;
+    background: #007AFF; color: #fff; border-radius: 48px;
+    padding: 48px; text-align: center;
+    font-size: 48px; font-weight: 700;
+  }
+  .s6-btn-secondary {
+    margin: 24px 60px 0;
+    background: rgba(52,199,89,0.12); color: #34c759;
+    border: 3px solid rgba(52,199,89,0.3);
+    border-radius: 48px; padding: 46px;
+    text-align: center; font-size: 48px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="nav" id="navbar">
+  <button onclick="show(1)" class="active">1. Welcome</button>
+  <button onclick="show(2)">2. Flashcard</button>
+  <button onclick="show(3)">3. Study Home</button>
+  <button onclick="show(4)">4. Library</button>
+  <button onclick="show(5)">5. Statistics</button>
+  <button onclick="show(6)">6. Summary</button>
+  <span class="info">1290 x 2796 px &mdash; right-click each page &rarr; "Save as image" or use DevTools screenshot</span>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 1: WELCOME
+══════════════════════════════════════════════════════ -->
+<div class="page active" id="page1">
+  <div class="screen-bg"></div>
+  <div class="s1-gradient"></div>
+  <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">&#9679;&#9679;&#9679;</span></div>
+  <div class="s1-content">
+    <div class="s1-circle"><span class="s1-kanji">&kanji;</span></div>
+    <div class="s1-jp">&#28450;&#23383;&#12501;&#12521;&#12483;&#12471;&#12517;&#12459;&#12540;&#12489;</div>
+    <div class="s1-title">Kanji<br>Flashcard App</div>
+    <div class="s1-sub">Master all 1,318 JLPT kanji<br>with science-backed spaced repetition.</div>
+    <div class="s1-dots">
+      <div class="s1-dot active"></div>
+      <div class="s1-dot"></div>
+      <div class="s1-dot"></div>
+      <div class="s1-dot"></div>
+    </div>
+    <div class="s1-btn">Next</div>
+    <div class="s1-skip">Skip</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 2: FLASHCARD SESSION
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page2">
+  <div class="screen-bg"></div>
+  <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">&#9679;&#9679;&#9679;</span></div>
+  <div class="s2-header">
+    <div class="s2-close">&times;</div>
+    <div class="s2-counter">5 / 10</div>
+    <div class="s2-accuracy">92%</div>
+  </div>
+  <div class="s2-progress"><div class="s2-progress-fill"></div></div>
+  <div class="s2-card">
+    <div class="s2-card-badge">N3</div>
+    <div class="s2-card-kanji">海</div>
+    <div class="s2-card-meaning">sea, ocean</div>
+    <div class="s2-card-divider"></div>
+    <div class="s2-readings">
+      <div class="s2-reading-col">
+        <div class="s2-reading-label" style="color:#ff3b30;">On'yomi</div>
+        <div class="s2-reading-val">カイ</div>
+      </div>
+      <div class="s2-reading-col">
+        <div class="s2-reading-label" style="color:#007AFF;">Kun'yomi</div>
+        <div class="s2-reading-val">うみ</div>
+      </div>
+    </div>
+    <div class="s2-example">
+      <div class="s2-ex-word">海外</div>
+      <div class="s2-ex-reading">かいがい</div>
+      <div class="s2-ex-meaning">overseas</div>
+    </div>
+  </div>
+  <div class="s2-rating-row">
+    <div class="s2-rate-btn btn-again"><div class="s2-rate-emoji">&#128308;</div><div class="s2-rate-label">Again</div></div>
+    <div class="s2-rate-btn btn-hard"><div class="s2-rate-emoji">&#128992;</div><div class="s2-rate-label">Hard</div></div>
+    <div class="s2-rate-btn btn-good"><div class="s2-rate-emoji">&#128994;</div><div class="s2-rate-label">Good</div></div>
+    <div class="s2-rate-btn btn-easy"><div class="s2-rate-emoji">&#11088;</div><div class="s2-rate-label">Easy</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 3: STUDY HOME (NEW)
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page3">
+  <div class="screen-bg"></div>
+  <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">&#9679;&#9679;&#9679;</span></div>
+  <div class="nav-title">Study</div>
+
+  <div class="s3-banner">
+    <div class="s3-banner-circle">12</div>
+    <div>
+      <div class="s3-banner-title">Cards due today</div>
+      <div class="s3-banner-sub">Keep your streak going!</div>
+    </div>
+  </div>
+
+  <div class="s3-section-title">Study levels</div>
+  <div class="s3-level-scroll">
+    <div class="s3-level-card s3-lc-selected" style="background:rgba(52,199,89,0.08);color:#34c759;">
+      <div class="s3-lc-header">
+        <div class="s3-lc-level" style="color:#34c759;">N5</div>
+        <div class="s3-lc-check">&#10003;</div>
+      </div>
+      <div class="s3-lc-count">85 kanji</div>
+      <div class="s3-lc-bar"><div class="s3-lc-bar-bg" style="background:rgba(52,199,89,0.15);"><div class="s3-lc-bar-fill" style="width:85%;background:#34c759;"></div></div></div>
+      <div class="s3-lc-pct" style="color:#34c759;margin-top:8px;">85%</div>
+    </div>
+    <div class="s3-level-card s3-lc-selected" style="background:rgba(0,122,255,0.08);color:#007AFF;">
+      <div class="s3-lc-header">
+        <div class="s3-lc-level" style="color:#007AFF;">N4</div>
+        <div class="s3-lc-check">&#10003;</div>
+      </div>
+      <div class="s3-lc-count">170 kanji</div>
+      <div class="s3-lc-bar"><div class="s3-lc-bar-bg" style="background:rgba(0,122,255,0.15);"><div class="s3-lc-bar-fill" style="width:55%;background:#007AFF;"></div></div></div>
+      <div class="s3-lc-pct" style="color:#007AFF;margin-top:8px;">55%</div>
+    </div>
+    <div class="s3-level-card" style="background:#fff;">
+      <div class="s3-lc-header">
+        <div class="s3-lc-level" style="color:#ff9500;">N3</div>
+      </div>
+      <div class="s3-lc-count">375 kanji</div>
+      <div class="s3-lc-bar"><div class="s3-lc-bar-bg" style="background:rgba(255,149,0,0.15);"><div class="s3-lc-bar-fill" style="width:13%;background:#ff9500;"></div></div></div>
+      <div class="s3-lc-pct" style="color:#ff9500;margin-top:8px;">13%</div>
+    </div>
+  </div>
+
+  <div class="s3-size-title">Cards per session</div>
+  <div class="s3-size-row">
+    <div class="s3-size-btn" style="background:#e5e5ea;color:#3a3a3c;">5</div>
+    <div class="s3-size-btn" style="background:#007AFF;color:#fff;">10</div>
+    <div class="s3-size-btn" style="background:#e5e5ea;color:#3a3a3c;">15</div>
+    <div class="s3-size-btn" style="background:#e5e5ea;color:#3a3a3c;">20</div>
+  </div>
+
+  <div class="s3-start-btn">&#9654;&ensp;Start Review (10)</div>
+
+  <div class="s3-stats-strip">
+    <div class="s3-stat">
+      <div class="s3-stat-icon">&#128218;</div>
+      <div class="s3-stat-val">214</div>
+      <div class="s3-stat-label">Learned</div>
+    </div>
+    <div class="s3-stat-divider"></div>
+    <div class="s3-stat">
+      <div class="s3-stat-icon">&#11088;</div>
+      <div class="s3-stat-val">143</div>
+      <div class="s3-stat-label">Mastered</div>
+    </div>
+    <div class="s3-stat-divider"></div>
+    <div class="s3-stat">
+      <div class="s3-stat-icon">&#128293;</div>
+      <div class="s3-stat-val">7</div>
+      <div class="s3-stat-label">Streak</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item"><div class="tab-icon">&#128218;</div><div class="tab-label">Library</div></div>
+    <div class="tab-item active"><div class="tab-icon">&#127891;</div><div class="tab-label">Study</div></div>
+    <div class="tab-item"><div class="tab-icon">&#128202;</div><div class="tab-label">Statistics</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 4: LIBRARY
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page4">
+  <div class="screen-bg"></div>
+  <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">&#9679;&#9679;&#9679;</span></div>
+  <div class="nav-title">Library</div>
+
+  <div class="s4-search">&#128269;&ensp;Search kanji, meaning, reading&hellip;</div>
+
+  <div class="s4-pill-row">
+    <div class="s4-pill" style="background:#007AFF;color:#fff;">All</div>
+    <div class="s4-pill" style="background:rgba(52,199,89,0.12);color:#34c759;border-color:rgba(52,199,89,0.3);">N5</div>
+    <div class="s4-pill" style="background:rgba(0,122,255,0.10);color:#007AFF;border-color:rgba(0,122,255,0.3);">N4</div>
+    <div class="s4-pill" style="background:rgba(255,149,0,0.10);color:#ff9500;border-color:rgba(255,149,0,0.3);">N3</div>
+    <div class="s4-pill" style="background:rgba(175,82,222,0.10);color:#af52de;border-color:rgba(175,82,222,0.3);">N2</div>
+    <div class="s4-pill" style="background:rgba(255,59,48,0.10);color:#ff3b30;border-color:rgba(255,59,48,0.3);">N1</div>
+  </div>
+
+  <div class="s4-grid">
+    <div class="s4-cell s4-cell-border" style="border-color:#34c759;"><span class="s4-cell-char">日</span><span class="s4-cell-mean">sun/day</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#34c759;"><span class="s4-cell-char">月</span><span class="s4-cell-mean">moon</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#34c759;"><span class="s4-cell-char">山</span><span class="s4-cell-mean">mountain</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#34c759;"><span class="s4-cell-char">川</span><span class="s4-cell-mean">river</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#34c759;"><span class="s4-cell-char">火</span><span class="s4-cell-mean">fire</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#007AFF;"><span class="s4-cell-char">水</span><span class="s4-cell-mean">water</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#007AFF;"><span class="s4-cell-char">木</span><span class="s4-cell-mean">tree</span></div>
+    <div class="s4-cell"><span class="s4-cell-char">土</span><span class="s4-cell-mean">earth</span></div>
+    <div class="s4-cell"><span class="s4-cell-char">金</span><span class="s4-cell-mean">gold</span></div>
+    <div class="s4-cell"><span class="s4-cell-char">人</span><span class="s4-cell-mean">person</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#34c759;"><span class="s4-cell-char">口</span><span class="s4-cell-mean">mouth</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#34c759;"><span class="s4-cell-char">目</span><span class="s4-cell-mean">eye</span></div>
+    <div class="s4-cell s4-cell-border" style="border-color:#007AFF;"><span class="s4-cell-char">耳</span><span class="s4-cell-mean">ear</span></div>
+    <div class="s4-cell"><span class="s4-cell-char">手</span><span class="s4-cell-mean">hand</span></div>
+    <div class="s4-cell"><span class="s4-cell-char">足</span><span class="s4-cell-mean">foot</span></div>
+  </div>
+
+  <div class="s4-level-progress">
+    <div class="s4-lp-header">
+      <div class="s4-lp-badge" style="background:rgba(52,199,89,0.12);color:#34c759;">N5</div>
+      <div class="s4-lp-count">72 / 85 learned</div>
+    </div>
+    <div class="s4-lp-bar" style="background:rgba(52,199,89,0.12);"><div class="s4-lp-bar-fill" style="width:85%;background:#34c759;"></div></div>
+  </div>
+  <div class="s4-level-progress" style="margin-top:24px;">
+    <div class="s4-lp-header">
+      <div class="s4-lp-badge" style="background:rgba(0,122,255,0.10);color:#007AFF;">N4</div>
+      <div class="s4-lp-count">94 / 170 learned</div>
+    </div>
+    <div class="s4-lp-bar" style="background:rgba(0,122,255,0.10);"><div class="s4-lp-bar-fill" style="width:55%;background:#007AFF;"></div></div>
+  </div>
+  <div class="s4-level-progress" style="margin-top:24px;">
+    <div class="s4-lp-header">
+      <div class="s4-lp-badge" style="background:rgba(255,149,0,0.10);color:#ff9500;">N3</div>
+      <div class="s4-lp-count">48 / 375 learned</div>
+    </div>
+    <div class="s4-lp-bar" style="background:rgba(255,149,0,0.10);"><div class="s4-lp-bar-fill" style="width:13%;background:#ff9500;"></div></div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item active"><div class="tab-icon">&#128218;</div><div class="tab-label">Library</div></div>
+    <div class="tab-item"><div class="tab-icon">&#127891;</div><div class="tab-label">Study</div></div>
+    <div class="tab-item"><div class="tab-icon">&#128202;</div><div class="tab-label">Statistics</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 5: STATISTICS
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page5">
+  <div class="screen-bg"></div>
+  <div class="status-bar"><span class="status-time">9:41</span><span class="status-icons">&#9679;&#9679;&#9679;</span></div>
+  <div class="nav-title">Statistics</div>
+
+  <div class="s5-kpi-strip">
+    <div class="s5-kpi">
+      <div class="s5-kpi-icon" style="color:#ff9500;">&#128293;</div>
+      <div class="s5-kpi-val" style="color:#000;">7</div>
+      <div class="s5-kpi-label">Streak</div>
+    </div>
+    <div class="s5-kpi-divider"></div>
+    <div class="s5-kpi">
+      <div class="s5-kpi-icon" style="color:#007AFF;">&#10227;</div>
+      <div class="s5-kpi-val" style="color:#000;">1,842</div>
+      <div class="s5-kpi-label">Reviews</div>
+    </div>
+    <div class="s5-kpi-divider"></div>
+    <div class="s5-kpi">
+      <div class="s5-kpi-icon" style="color:#34c759;">&#10003;</div>
+      <div class="s5-kpi-val" style="color:#000;">78%</div>
+      <div class="s5-kpi-label">Accuracy</div>
+    </div>
+  </div>
+
+  <div class="s5-section">
+    <div class="s5-section-title">Mastery Overview</div>
+    <div class="s5-mastery-row">
+      <div class="s5-mastery-dot" style="background:#34c759;"></div>
+      <div class="s5-mastery-label">Mastered</div>
+      <div class="s5-mastery-bar"><div class="s5-mastery-bar-bg" style="background:rgba(52,199,89,0.15);"></div><div class="s5-mastery-bar-fill" style="width:11%;background:#34c759;"></div></div>
+      <div class="s5-mastery-val" style="color:#34c759;">143</div>
+    </div>
+    <div class="s5-mastery-row">
+      <div class="s5-mastery-dot" style="background:#007AFF;"></div>
+      <div class="s5-mastery-label">In Progress</div>
+      <div class="s5-mastery-bar"><div class="s5-mastery-bar-bg" style="background:rgba(0,122,255,0.15);"></div><div class="s5-mastery-bar-fill" style="width:5%;background:#007AFF;"></div></div>
+      <div class="s5-mastery-val" style="color:#007AFF;">71</div>
+    </div>
+    <div class="s5-mastery-row">
+      <div class="s5-mastery-dot" style="background:#c7c7cc;"></div>
+      <div class="s5-mastery-label">Not Started</div>
+      <div class="s5-mastery-bar"><div class="s5-mastery-bar-bg" style="background:rgba(199,199,204,0.25);"></div><div class="s5-mastery-bar-fill" style="width:84%;background:#c7c7cc;"></div></div>
+      <div class="s5-mastery-val" style="color:#8e8e93;">1,104</div>
+    </div>
+  </div>
+
+  <div class="s5-section">
+    <div class="s5-section-title">Progress by Level</div>
+    <div class="s5-level-row">
+      <div class="s5-level-name" style="color:#34c759;">N5</div>
+      <div class="s5-level-bar"><div class="s5-level-bar-bg" style="background:rgba(52,199,89,0.12);"></div><div class="s5-level-bar-fill" style="width:85%;background:#34c759;"></div></div>
+      <div class="s5-level-pct" style="color:#34c759;">85%</div>
+    </div>
+    <div class="s5-level-row">
+      <div class="s5-level-name" style="color:#007AFF;">N4</div>
+      <div class="s5-level-bar"><div class="s5-level-bar-bg" style="background:rgba(0,122,255,0.10);"></div><div class="s5-level-bar-fill" style="width:55%;background:#007AFF;"></div></div>
+      <div class="s5-level-pct" style="color:#007AFF;">55%</div>
+    </div>
+    <div class="s5-level-row">
+      <div class="s5-level-name" style="color:#ff9500;">N3</div>
+      <div class="s5-level-bar"><div class="s5-level-bar-bg" style="background:rgba(255,149,0,0.10);"></div><div class="s5-level-bar-fill" style="width:13%;background:#ff9500;"></div></div>
+      <div class="s5-level-pct" style="color:#ff9500;">13%</div>
+    </div>
+    <div class="s5-level-row">
+      <div class="s5-level-name" style="color:#af52de;">N2</div>
+      <div class="s5-level-bar"><div class="s5-level-bar-bg" style="background:rgba(175,82,222,0.10);"></div><div class="s5-level-bar-fill" style="width:0%;background:#af52de;"></div></div>
+      <div class="s5-level-pct" style="color:#af52de;">0%</div>
+    </div>
+    <div class="s5-level-row">
+      <div class="s5-level-name" style="color:#ff3b30;">N1</div>
+      <div class="s5-level-bar"><div class="s5-level-bar-bg" style="background:rgba(255,59,48,0.10);"></div><div class="s5-level-bar-fill" style="width:0%;background:#ff3b30;"></div></div>
+      <div class="s5-level-pct" style="color:#ff3b30;">0%</div>
+    </div>
+  </div>
+
+  <div class="s5-section">
+    <div class="s5-section-title">Activity (last 12 weeks)</div>
+    <div class="s5-heatmap-grid" id="heatmap"></div>
+    <div class="s5-footer-row">
+      <div class="s5-footer-dot" style="background:#e5e5ea;"></div>
+      <div class="s5-footer-label">No study</div>
+      <div style="width:24px;"></div>
+      <div class="s5-footer-dot" style="background:#007AFF;"></div>
+      <div class="s5-footer-label">Studied</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item"><div class="tab-icon">&#128218;</div><div class="tab-label">Library</div></div>
+    <div class="tab-item"><div class="tab-icon">&#127891;</div><div class="tab-label">Study</div></div>
+    <div class="tab-item active"><div class="tab-icon">&#128202;</div><div class="tab-label">Statistics</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE 6: SESSION SUMMARY
+══════════════════════════════════════════════════════ -->
+<div class="page" id="page6">
+  <div class="screen-bg"></div>
+  <div class="s6-bg"></div>
+  <div class="status-bar" style="position:relative;z-index:10;"><span class="status-time">9:41</span><span class="status-icons">&#9679;&#9679;&#9679;</span></div>
+  <div class="s6-content">
+    <div class="s6-emoji">&#127881;</div>
+    <div class="s6-title">Session Complete!</div>
+    <div class="s6-sub">Great work keeping up your practice.</div>
+
+    <div class="s6-stats-grid">
+      <div class="s6-stat-card"><div class="s6-stat-val" style="color:#007AFF;">10</div><div class="s6-stat-label">Reviewed</div></div>
+      <div class="s6-stat-card"><div class="s6-stat-val" style="color:#34c759;">9</div><div class="s6-stat-label">Correct</div></div>
+      <div class="s6-stat-card"><div class="s6-stat-val" style="color:#ff9500;">90%</div><div class="s6-stat-label">Accuracy</div></div>
+      <div class="s6-stat-card"><div class="s6-stat-val" style="color:#af52de;">2m 15s</div><div class="s6-stat-label">Duration</div></div>
+    </div>
+
+    <div class="s6-streak-banner">
+      <div class="s6-streak-icon">&#128293;</div>
+      <div>
+        <div class="s6-streak-title">7-Day Streak!</div>
+        <div class="s6-streak-sub">Come back tomorrow to keep it going</div>
+      </div>
+    </div>
+
+    <div class="s6-btn-primary">Back to Study</div>
+    <div class="s6-btn-secondary">&#8635;&ensp;Keep Practicing</div>
+  </div>
+</div>
+
+<script>
+// Navigation
+function show(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page' + n).classList.add('active');
+  document.querySelectorAll('.nav button').forEach((b, i) => b.classList.toggle('active', i === n - 1));
+}
+
+// Generate heatmap
+(function() {
+  const grid = document.getElementById('heatmap');
+  // 12 weeks x 7 days, randomise ~40% filled
+  const pattern = [1,1,0,1,1,1,0, 0,1,1,0,1,0,0, 1,1,1,1,0,1,1, 0,0,1,1,1,0,0,
+                   1,1,0,1,1,1,1, 0,1,1,0,0,1,0, 1,0,1,1,1,1,0, 1,1,0,1,0,1,1,
+                   0,1,1,1,1,0,0, 1,0,1,0,1,1,1, 1,1,1,0,1,1,0, 0,1,1,1,1,1,1];
+  for (let w = 0; w < 12; w++) {
+    const col = document.createElement('div');
+    col.className = 's5-heatmap-col';
+    for (let d = 0; d < 7; d++) {
+      const cell = document.createElement('div');
+      cell.className = 's5-heatmap-cell';
+      cell.style.background = pattern[w * 7 + d] ? '#007AFF' : '#e5e5ea';
+      col.appendChild(cell);
+    }
+    grid.appendChild(col);
+  }
+})();
+
+// Fix the kanji entity in welcome screen
+document.querySelector('.s1-kanji').textContent = '\u6F22';
+</script>
+
+</body>
+</html>
