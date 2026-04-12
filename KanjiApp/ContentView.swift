@@ -26,6 +26,10 @@ struct ContentView: View {
                 }
         }
         .tint(Color.accentColor)
+        .fullScreenCover(isPresented: .constant(!appState.hasCompletedOnboarding)) {
+            OnboardingView()
+                .environmentObject(appState)
+        }
         .overlay(alignment: .topTrailing) {
             // Gear button floated over every tab so it's always accessible
             Button {
