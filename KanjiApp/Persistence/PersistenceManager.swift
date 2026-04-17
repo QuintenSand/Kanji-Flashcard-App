@@ -57,6 +57,7 @@ final class AppState: ObservableObject {
 
     // ─────────────────────────────────────────────────────
     private let defaults = UserDefaults.standard
+    private var isLoading = false
 
     private enum Keys {
         static let cards                = "srs_cards_v1"
@@ -173,6 +174,7 @@ final class AppState: ObservableObject {
     // MARK: - Persistence
 
     private func save() {
+        guard !isLoading else { return }
         if let d = try? JSONEncoder().encode(cards)         { defaults.set(d, forKey: Keys.cards) }
         if let d = try? JSONEncoder().encode(studyDates)    { defaults.set(d, forKey: Keys.studyDates) }
         if let d = try? JSONEncoder().encode(sessionHistory){ defaults.set(d, forKey: Keys.sessionHistory) }
@@ -180,6 +182,7 @@ final class AppState: ObservableObject {
     }
 
     private func load() {
+        isLoading = true
         if let d = defaults.data(forKey: Keys.cards),
            let v = try? JSONDecoder().decode([String: SRSCard].self, from: d)   { cards = v }
         if let d = defaults.data(forKey: Keys.studyDates),
@@ -195,6 +198,7 @@ final class AppState: ObservableObject {
         notificationHour          = defaults.object(forKey: Keys.notificationHour)         as? Int ?? 9
         notificationMinute        = defaults.object(forKey: Keys.notificationMinute)       as? Int ?? 0
         hasCompletedOnboarding    = defaults.bool(forKey: Keys.hasCompletedOnboarding)
+        isLoading = false
     }
 }
 
