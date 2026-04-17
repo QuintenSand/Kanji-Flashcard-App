@@ -1,11 +1,19 @@
 import SwiftUI
 
+// MARK: - Study Mode
+enum StudyMode: String, CaseIterable {
+    case dueReview = "Due Review"
+    case newKanji  = "New Kanji"
+    case problemKanji = "Problem"
+}
+
 // MARK: - Study Home
 struct StudyView: View {
     @EnvironmentObject var appState: AppState
     @State private var showLevelPicker = false
     @State private var showSession    = false
     @State private var sessionQueue: [Kanji] = []
+    @State private var studyMode: StudyMode = .dueReview
 
     private let sessionSizeOptions = [5, 10, 15, 20]
 
@@ -27,6 +35,50 @@ struct StudyView: View {
 
     private var practiceCardCount: Int {
         min(practiceKanji.count, appState.sessionSize)
+    }
+
+    // New kanji only (never studied)
+    private var newKanji: [Kanji] {
+        SRSEngine.newCards(from: appState.cards, levels: appState.selectedLevels, limit: 10_000)
+    }
+
+    // Problem kanji for selected levels
+    private var problemKanjiCards: [Kanji] {
+        SRSEngine.problemCards(from: appState.cards, levels: appState.selectedLevels, limit: 10_000)
+    }
+
+    // Current mode's available card count
+    private var currentModeCount: Int {
+        switch studyMode {
+        case .dueReview:    return dueKanji.count
+        case .newKanji:     return newKanji.count
+        case .problemKanji: return problemKanjiCards.count
+        }
+    }
+
+    private var currentSessionCount: Int {
+        min(currentModeCount, appState.sessionSize)
+    }
+
+    private var buttonLabel: String {
+        switch studyMode {
+        case .dueReview:    return "Start Review (\(currentSessionCount))"
+        case .newKanji:     return "Learn New (\(currentSessionCount))"
+        case .problemKanji: return "Practice Weak (\(currentSessionCount))"
+        }
+    }
+
+    private func startSession() {
+        let limit = appState.sessionSize
+        switch studyMode {
+        case .dueReview:
+            sessionQueue = SRSEngine.dueCards(from: appState.cards, levels: appState.selectedLevels, limit: limit)
+        case .newKanji:
+            sessionQueue = SRSEngine.newCards(from: appState.cards, levels: appState.selectedLevels, limit: limit)
+        case .problemKanji:
+            sessionQueue = SRSEngine.problemCards(from: appState.cards, levels: appState.selectedLevels, limit: limit)
+        }
+        showSession = true
     }
 
     var body: some View {
@@ -63,6 +115,39 @@ struct StudyView: View {
                         }
                     }
 
+                    // ── Study mode picker
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Study mode")
+                            .font(.headline)
+                            .padding(.horizontal)
+
+                        Picker("Study mode", selection: $studyMode) {
+                            ForEach(StudyMode.allCases, id: \.self) { mode in
+                                Text(mode.rawValue).tag(mode)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .padding(.horizontal)
+
+                        // Mode description
+                        HStack(spacing: 8) {
+                            Group {
+                                switch studyMode {
+                                case .dueReview:
+                                    Label("\(dueKanji.count) cards due + new", systemImage: "clock.arrow.circlepath")
+                                case .newKanji:
+                                    Label("\(newKanji.count) unseen kanji", systemImage: "sparkles")
+                                case .problemKanji:
+                                    Label("\(problemKanjiCards.count) difficult kanji", systemImage: "exclamationmark.triangle")
+                                }
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                    }
+
                     // ── Session size picker
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Cards per session")
@@ -89,15 +174,15 @@ struct StudyView: View {
                         .padding(.horizontal)
                     }
 
-                    // ── Start session / Keep practicing buttons
-                    if dueKanji.isEmpty {
-                        // Daily queue done — show extra practice option
-                        VStack(spacing: 10) {
-                            // Disabled "all done" indicator
+                    // ── Start session button
+                    VStack(spacing: 10) {
+                        if currentModeCount == 0 {
                             HStack {
-                                Image(systemName: "checkmark.circle.fill")
+                                Image(systemName: studyMode == .dueReview ? "checkmark.circle.fill" : "info.circle.fill")
                                     .font(.title3)
-                                Text("All caught up!")
+                                Text(studyMode == .dueReview ? "All caught up!" :
+                                     studyMode == .newKanji ? "No new kanji in selected levels" :
+                                     "No problem kanji yet — keep studying!")
                                     .font(.headline)
                             }
                             .frame(maxWidth: .infinity)
@@ -106,8 +191,8 @@ struct StudyView: View {
                             .foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
 
-                            // Keep practicing button (only shown when there are studied cards)
-                            if !practiceKanji.isEmpty {
+                            // Keep practicing fallback for due review mode
+                            if studyMode == .dueReview && !practiceKanji.isEmpty {
                                 Button {
                                     sessionQueue = SRSEngine.practiceCards(
                                         from: appState.cards,
@@ -129,33 +214,27 @@ struct StudyView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 16))
                                 }
                             }
-                        }
-                        .padding(.horizontal)
-                    } else {
-                        Button {
-                            // Snapshot the queue at tap time so fullScreenCover
-                            // always receives the current sessionSize.
-                            sessionQueue = SRSEngine.dueCards(
-                                from: appState.cards,
-                                levels: appState.selectedLevels,
-                                limit: appState.sessionSize
-                            )
-                            showSession = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "play.fill")
-                                    .font(.title3)
-                                Text("Start Review (\(sessionCardCount))")
-                                    .font(.headline)
+                        } else {
+                            Button {
+                                startSession()
+                            } label: {
+                                HStack {
+                                    Image(systemName: studyMode == .dueReview ? "play.fill" :
+                                          studyMode == .newKanji ? "sparkles" :
+                                          "exclamationmark.triangle.fill")
+                                        .font(.title3)
+                                    Text(buttonLabel)
+                                        .font(.headline)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(studyMode == .problemKanji ? Color.orange : Color.accentColor)
+                                .foregroundStyle(.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.accentColor)
-                            .foregroundStyle(.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
                         }
-                        .padding(.horizontal)
                     }
+                    .padding(.horizontal)
 
                     // ── Quick stats strip
                     HStack(spacing: 0) {

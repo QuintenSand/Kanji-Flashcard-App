@@ -26,7 +26,10 @@ struct ContentView: View {
                 }
         }
         .tint(Color.accentColor)
-        .fullScreenCover(isPresented: .constant(!appState.hasCompletedOnboarding)) {
+        .fullScreenCover(isPresented: Binding(
+            get: { !appState.hasCompletedOnboarding },
+            set: { if !$0 { appState.hasCompletedOnboarding = true } }
+        )) {
             OnboardingView()
                 .environmentObject(appState)
         }

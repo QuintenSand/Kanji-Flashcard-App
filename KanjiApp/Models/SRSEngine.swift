@@ -120,6 +120,32 @@ struct SRSEngine {
         return (dueBatch + newBatch).shuffled()
     }
 
+    /// Problem kanji: reviewed at least 3 times with accuracy below 60%.
+    /// Sorted by lowest accuracy first (hardest kanji first).
+    static func problemCards(
+        from cards: [String: SRSCard],
+        levels: Set<JLPTLevel>,
+        limit: Int = 20
+    ) -> [Kanji] {
+        let levelKanjiIDs = Set(KanjiDatabase.all.filter { levels.contains($0.level) }.map { $0.id })
+        let problemIDs = cards.values
+            .filter { $0.totalReviews >= 3 && $0.accuracy < 0.6 && levelKanjiIDs.contains($0.id) }
+            .sorted { $0.accuracy < $1.accuracy }
+            .prefix(limit)
+            .map { $0.id }
+        return problemIDs.compactMap { id in KanjiDatabase.all.first(where: { $0.id == id }) }
+    }
+
+    /// Only new kanji that have never been studied.
+    static func newCards(
+        from cards: [String: SRSCard],
+        levels: Set<JLPTLevel>,
+        limit: Int = 20
+    ) -> [Kanji] {
+        let allKanji = KanjiDatabase.all.filter { levels.contains($0.level) }
+        return Array(allKanji.filter { cards[$0.id] == nil }.prefix(limit))
+    }
+
     /// Cards for extra practice: already studied but not yet due, sorted by
     /// soonest upcoming review date first (i.e. closest to due = most useful to revisit).
     static func practiceCards(

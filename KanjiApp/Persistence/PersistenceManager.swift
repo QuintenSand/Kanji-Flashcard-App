@@ -114,6 +114,17 @@ final class AppState: ObservableObject {
     var learnedCount:  Int { cards.values.filter { $0.repetitions > 0 }.count }
     var dueCount:      Int { cards.values.filter { $0.isDueForReview }.count }
 
+    /// Kanji that the user struggles with: reviewed at least 3 times with accuracy below 60%.
+    var problemKanji: [(kanji: Kanji, card: SRSCard)] {
+        cards.values
+            .filter { $0.totalReviews >= 3 && $0.accuracy < 0.6 }
+            .sorted { $0.accuracy < $1.accuracy }
+            .compactMap { card in
+                guard let kanji = KanjiDatabase.all.first(where: { $0.id == card.id }) else { return nil }
+                return (kanji: kanji, card: card)
+            }
+    }
+
     func levelProgress(_ level: JLPTLevel) -> Double {
         let total = KanjiDatabase.all.filter { $0.level == level }.count
         guard total > 0 else { return 0 }

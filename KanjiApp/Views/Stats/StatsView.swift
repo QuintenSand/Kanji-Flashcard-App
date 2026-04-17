@@ -43,6 +43,12 @@ struct StatsView: View {
                     ActivityHeatmap()
                         .padding(.horizontal)
 
+                    // ── Problem kanji
+                    if !appState.problemKanji.isEmpty {
+                        ProblemKanjiSection()
+                            .padding(.horizontal)
+                    }
+
                     // ── Recent sessions
                     if !appState.sessionHistory.isEmpty {
                         RecentSessionsSection()
@@ -269,6 +275,67 @@ private struct ActivityHeatmap: View {
         .clipShape(RoundedRectangle(cornerRadius: 18))
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Activity heatmap, last 12 weeks. You studied on \(studiedDaysCount) of \(columns * rows) days.")
+    }
+}
+
+// MARK: - Problem Kanji
+private struct ProblemKanjiSection: View {
+    @EnvironmentObject var appState: AppState
+
+    private var items: [(kanji: Kanji, card: SRSCard)] {
+        Array(appState.problemKanji.prefix(10))
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text("Problem Kanji")
+                    .font(.headline)
+                Spacer()
+                Text("\(appState.problemKanji.count) total")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Text("Kanji you find most difficult (below 60% accuracy)")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            ForEach(items, id: \.kanji.id) { item in
+                HStack(spacing: 14) {
+                    Text(item.kanji.id)
+                        .font(.system(size: 32, weight: .light))
+                        .frame(width: 44, height: 44)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(item.kanji.meanings.joined(separator: ", "))
+                            .font(.subheadline.weight(.medium))
+                            .lineLimit(1)
+                        Text("\(item.card.totalReviews) reviews · \(item.card.correctReviews) correct")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    Text(String(format: "%.0f%%", item.card.accuracy * 100))
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(item.card.accuracy < 0.3 ? .red : .orange)
+                }
+                .padding(.vertical, 4)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("\(item.kanji.id), \(item.kanji.meanings.first ?? ""), \(String(format: "%.0f", item.card.accuracy * 100)) percent accuracy after \(item.card.totalReviews) reviews")
+
+                if item.kanji.id != items.last?.kanji.id {
+                    Divider()
+                }
+            }
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
     }
 }
 
