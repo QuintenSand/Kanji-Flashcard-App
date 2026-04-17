@@ -134,7 +134,7 @@ struct StudyView: View {
                             Group {
                                 switch studyMode {
                                 case .dueReview:
-                                    Label("\(dueKanji.count) cards due + new", systemImage: "clock.arrow.circlepath")
+                                    Label("\(dueKanji.count) cards due for review", systemImage: "clock.arrow.circlepath")
                                 case .newKanji:
                                     Label("\(newKanji.count) unseen kanji", systemImage: "sparkles")
                                 case .problemKanji:

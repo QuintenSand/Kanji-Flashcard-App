@@ -100,7 +100,7 @@ struct SRSEngine {
         return c
     }
 
-    /// Pick up to `limit` cards due for review from a set of levels.
+    /// Pick up to `limit` cards that are due for review (already studied at least once).
     static func dueCards(
         from cards: [String: SRSCard],
         levels: Set<JLPTLevel>,
@@ -108,16 +108,12 @@ struct SRSEngine {
     ) -> [Kanji] {
         let allKanji = KanjiDatabase.all.filter { levels.contains($0.level) }
 
-        // New cards (never studied) first, then due cards
-        let newKanji = allKanji.filter { cards[$0.id] == nil }
+        // Only cards that have been studied before and are now due
         let dueKanji = allKanji.filter {
             if let card = cards[$0.id] { return card.isDueForReview } else { return false }
         }
 
-        // Prioritise due cards first, then fill remaining slots with new cards
-        let dueBatch = Array(dueKanji.prefix(limit))
-        let newBatch = Array(newKanji.prefix(limit - dueBatch.count))
-        return (dueBatch + newBatch).shuffled()
+        return Array(dueKanji.prefix(limit)).shuffled()
     }
 
     /// Problem kanji: reviewed at least 3 times with accuracy below 60%.
