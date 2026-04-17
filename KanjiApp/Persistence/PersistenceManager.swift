@@ -57,6 +57,7 @@ final class AppState: ObservableObject {
 
     // ─────────────────────────────────────────────────────
     private let defaults = UserDefaults.standard
+    private var isLoading = false
 
     private enum Keys {
         static let cards                = "srs_cards_v1"
@@ -112,6 +113,17 @@ final class AppState: ObservableObject {
     var masteredCount: Int { cards.values.filter { $0.interval >= 21 }.count }
     var learnedCount:  Int { cards.values.filter { $0.repetitions > 0 }.count }
     var dueCount:      Int { cards.values.filter { $0.isDueForReview }.count }
+
+    /// Kanji that the user struggles with: reviewed at least 3 times with accuracy below 60%.
+    var problemKanji: [(kanji: Kanji, card: SRSCard)] {
+        cards.values
+            .filter { $0.totalReviews >= 3 && $0.accuracy < 0.6 }
+            .sorted { $0.accuracy < $1.accuracy }
+            .compactMap { card in
+                guard let kanji = KanjiDatabase.all.first(where: { $0.id == card.id }) else { return nil }
+                return (kanji: kanji, card: card)
+            }
+    }
 
     func levelProgress(_ level: JLPTLevel) -> Double {
         let total = KanjiDatabase.all.filter { $0.level == level }.count
@@ -173,6 +185,7 @@ final class AppState: ObservableObject {
     // MARK: - Persistence
 
     private func save() {
+        guard !isLoading else { return }
         if let d = try? JSONEncoder().encode(cards)         { defaults.set(d, forKey: Keys.cards) }
         if let d = try? JSONEncoder().encode(studyDates)    { defaults.set(d, forKey: Keys.studyDates) }
         if let d = try? JSONEncoder().encode(sessionHistory){ defaults.set(d, forKey: Keys.sessionHistory) }
@@ -180,6 +193,7 @@ final class AppState: ObservableObject {
     }
 
     private func load() {
+        isLoading = true
         if let d = defaults.data(forKey: Keys.cards),
            let v = try? JSONDecoder().decode([String: SRSCard].self, from: d)   { cards = v }
         if let d = defaults.data(forKey: Keys.studyDates),
@@ -195,6 +209,7 @@ final class AppState: ObservableObject {
         notificationHour          = defaults.object(forKey: Keys.notificationHour)         as? Int ?? 9
         notificationMinute        = defaults.object(forKey: Keys.notificationMinute)       as? Int ?? 0
         hasCompletedOnboarding    = defaults.bool(forKey: Keys.hasCompletedOnboarding)
+        isLoading = false
     }
 }
 
